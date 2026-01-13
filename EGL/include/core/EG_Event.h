@@ -127,12 +127,10 @@ public:
   void*                   GetParam(void){ return m_pParam; };
   void*                   GetExtParam(void){ return m_pExtParam; };
   bool                    ShouldBubble(void);
-  void                    StopBubling(void){ m_StopBubbling = 1; };
+  void                    StopBubbling(void){ m_StopBubbling = 1; };
   void                    StopProcessing(void){ m_StopProcessing = 1; };
-  uint32_t                RegisterID(void);
   bool                    RemoveEventCBWithUserData(EGObject *pObj, EG_EventCB_t EventCB, const void *pParam);
   bool                    RemoveEventDiscriptor(EGObject *pObj, struct EG_EventDiscriptor_t *pEventDiscriptor);
-  void*                   GetEventExtParam(EGObject *pObj, EG_EventCB_t EventCB);
   EGInputDevice*          GetInputDevice(void);
   EGDrawContext*          GetDrawPartDiscriptor(void);
   EGDrawContext*          GetDrawContext(void);
@@ -149,6 +147,8 @@ public:
   static bool             RemoveEventCB(EGObject *pObj, EG_EventCB_t EventCB);
   static EG_Result_t      EventSend(EGObject *pObj, EG_EventCode_e EventCode, void *pParam);
   static void             MarkDeleted(EGObject *pObj);
+  static EG_EventCode_e   GenerateNewID(void);
+  static void*            GetEventExtParam(EGObject *pObj, EG_EventCB_t EventCB);
 
   EGObject               *m_pTarget;
   EGObject               *m_pCurrentTarget;

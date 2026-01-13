@@ -614,10 +614,10 @@ public:
   void                    SetScrollDirection(EG_DirType_e Direction); // Set the object in which directions can be scrolled
   void                    SetScrollSnapX(EG_ScrollSnap_e Align); // Set where to snap the children when scrolling ends horizontally
   void                    SetScrollSnapY(EG_ScrollSnap_e Align); // Set where to snap the children when scrolling ends vertically
-  EG_ScrollbarMode_e     GetScrollbarMode(void); // Get the current scroll mode (when to hide the scrollbars)
+  EG_ScrollbarMode_e      GetScrollbarMode(void); // Get the current scroll mode (when to hide the scrollbars)
   EG_DirType_e            GetScrollDirection(void); // Get the object in which directions can be scrolled
-  EG_ScrollSnap_e        GetScrollSnapX(void); // Get where to snap the children when scrolling ends horizontally
-  EG_ScrollSnap_e        GetScrollSnapY(void); // Get where to snap the children when scrolling ends vertically
+  EG_ScrollSnap_e         GetScrollSnapX(void); // Get where to snap the children when scrolling ends horizontally
+  EG_ScrollSnap_e         GetScrollSnapY(void); // Get where to snap the children when scrolling ends vertically
   EG_Coord_t              GetScrollX(void); // Get current X scroll position.
   EG_Coord_t              GetScrollY(void); // Get current Y scroll position.
   EG_Coord_t              GetScrollTop(void); // Return the height of the area above the object.

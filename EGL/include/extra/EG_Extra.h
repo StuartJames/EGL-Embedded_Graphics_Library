@@ -25,7 +25,7 @@
 
 #include "./layouts/EG_Layouts.h"
 #include "./libs/lv_libs.h"
-#include "./others/lv_others.h"
+#include "./others/EG_Others.h"
 #include "./themes/EG_Themes.h"
 #include "./widgets/EG_Widgets.h"
 
