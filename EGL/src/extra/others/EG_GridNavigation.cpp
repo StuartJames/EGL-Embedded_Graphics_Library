@@ -32,7 +32,7 @@
 
 void EGGridNav::Install(EGObject *pObj, EG_GridNavControl_e m_Control)
 {
-	Remove(pObj); // Be sure to not add gridnav twice
+	Remove(pObj); // Be sure not to add gridnav twice
   EGGridNav *pGridNav = new EGGridNav;
 	pGridNav->m_Control = m_Control;
 	pGridNav->m_pFocused = NULL;
