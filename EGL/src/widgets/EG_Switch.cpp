@@ -200,7 +200,7 @@ void EGSwitch::TriggerAnimate(void)
 			AnimateEnd = Checked ? EG_SWITCH_ANIM_STATE_END : EG_SWITCH_ANIM_STATE_START;
 		}
 		// Calculate actual animation duration
-		uint32_t AnimateDuration = (AnimationTime * LV_ABS(AnimateStart - AnimateEnd)) / EG_SWITCH_ANIM_STATE_END;
+		uint32_t AnimateDuration = (AnimationTime * EG_ABS(AnimateStart - AnimateEnd)) / EG_SWITCH_ANIM_STATE_END;
 		EGAnimate::Delete(this, nullptr);		// Stop the previous animation if it exists
 		EGAnimate Animate;
 		Animate.SetItem(this);

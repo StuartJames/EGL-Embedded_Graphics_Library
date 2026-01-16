@@ -132,7 +132,7 @@ uint32_t EG_Rand(uint32_t min, uint32_t max);
 
 #define LV_CLAMP(min, val, max) (EG_MAX(min, (EG_MIN(val, max))))
 
-#define LV_ABS(x) ((x) > 0 ? (x) : (-(x)))
+#define EG_ABS(x) ((x) > 0 ? (x) : (-(x)))
 #define LV_UDIV255(x) (((x) * 0x8081U) >> 0x17)
 
 #define LV_IS_SIGNED(t) (((t)(-1)) < ((t)0))

@@ -32,7 +32,7 @@ EGStyleProperty_e  EGFlexLayout::m_StyleMainPlace;
 EGStyleProperty_e  EGFlexLayout::m_StyleCrossPlace;
 EGStyleProperty_e  EGFlexLayout::m_StyleTrackPlace;
 EGStyleProperty_e  EGFlexLayout::m_StyleGrow;
-uint32_t           EGFlexLayout::m_LayoutReference;
+uint32_t           EGFlexLayout::m_Reference;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -56,7 +56,7 @@ void EGFlexLayout::Initialise(void)
 	m_StyleCrossPlace = EGStyle::RegisterProperty(EG_STYLE_PROP_LAYOUT_REFRESH);
 	m_StyleTrackPlace = EGStyle::RegisterProperty(EG_STYLE_PROP_LAYOUT_REFRESH);
 	m_StyleGrow = EGStyle::RegisterProperty(EG_STYLE_PROP_LAYOUT_REFRESH);
-	m_LayoutReference = EGObject::LayoutRegister(EGFlexLayout::UpdateCB, nullptr);
+	m_Reference = EGObject::LayoutRegister(EGFlexLayout::UpdateCB, nullptr);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -64,7 +64,7 @@ void EGFlexLayout::Initialise(void)
 void EGFlexLayout::SetObjFlow(EGObject *pObj, EG_FlexFlow_e Flow)
 {
 	SetObjStyleFlow(pObj, Flow, 0);
-	pObj->SetStyleLayout(m_LayoutReference, 0);
+	pObj->SetStyleLayout(m_Reference, 0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -74,7 +74,7 @@ void EGFlexLayout::SetObjAlign(EGObject *pObj, EG_FlexAlign_e m_MainPlace, EG_Fl
 	SetObjStyleMainPlace(pObj, m_MainPlace, 0);
 	SetObjStyleCrossPlace(pObj, m_CrossPlace, 0);
 	SetObjStyleTrackPlace(pObj, m_TrackPlace, 0);
-	pObj->SetStyleLayout(m_LayoutReference, 0);
+	pObj->SetStyleLayout(m_Reference, 0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

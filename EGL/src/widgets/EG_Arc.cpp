@@ -137,7 +137,7 @@ void EGArc::SetStartAngle(uint16_t Start)
 	int16_t NewDelta = m_IndicAngleEnd - Start;
 	if(OldDelta < 0) OldDelta = 360 + OldDelta;
 	if(NewDelta < 0) NewDelta = 360 + NewDelta;
-	if(LV_ABS(NewDelta - OldDelta) > 180)	Invalidate();
+	if(EG_ABS(NewDelta - OldDelta) > 180)	Invalidate();
 	else if(NewDelta < OldDelta) InvalidateArcArea(m_IndicAngleStart, Start, EG_PART_INDICATOR);
 	else if(OldDelta < NewDelta) InvalidateArcArea(Start, m_IndicAngleStart, EG_PART_INDICATOR);
 	InvalidateKnobArea();
@@ -154,7 +154,7 @@ void EGArc::SetEndAngle(uint16_t End)
 	int16_t NewDelta = End - m_IndicAngleStart;
 	if(OldDelta < 0) OldDelta = 360 + OldDelta;
 	if(NewDelta < 0) NewDelta = 360 + NewDelta;
-	if(LV_ABS(NewDelta - OldDelta) > 180)	Invalidate();
+	if(EG_ABS(NewDelta - OldDelta) > 180)	Invalidate();
 	else if(NewDelta < OldDelta) InvalidateArcArea(End, m_IndicAngleEnd, EG_PART_INDICATOR);
 	else if(OldDelta < NewDelta) InvalidateArcArea(m_IndicAngleEnd, End, EG_PART_INDICATOR);
 	InvalidateKnobArea();
@@ -179,7 +179,7 @@ void EGArc::SetBackgroundStartAngle(uint16_t Start)
 	int16_t NewDelta = m_BackgroundAngleEnd - Start;
 	if(OldDelta < 0) OldDelta = 360 + OldDelta;
 	if(NewDelta < 0) NewDelta = 360 + NewDelta;
-	if(LV_ABS(NewDelta - OldDelta) > 180)	Invalidate();
+	if(EG_ABS(NewDelta - OldDelta) > 180)	Invalidate();
 	else if(NewDelta < OldDelta) InvalidateArcArea(m_BackgroundAngleStart, Start, EG_PART_MAIN);
 	else if(OldDelta < NewDelta) InvalidateArcArea(Start, m_BackgroundAngleStart, EG_PART_MAIN);
 	m_BackgroundAngleStart = Start;
@@ -195,7 +195,7 @@ void EGArc::SetBackgroundEndAngle(uint16_t End)
 	int16_t NewDelta = End - m_BackgroundAngleStart;
 	if(OldDelta < 0) OldDelta = 360 + OldDelta;
 	if(NewDelta < 0) NewDelta = 360 + NewDelta;
-	if(LV_ABS(NewDelta - OldDelta) > 180) Invalidate();
+	if(EG_ABS(NewDelta - OldDelta) > 180) Invalidate();
 	else if(NewDelta < OldDelta) InvalidateArcArea(End, m_BackgroundAngleEnd, EG_PART_MAIN);
 	else if(OldDelta < NewDelta) InvalidateArcArea(m_BackgroundAngleEnd, End, EG_PART_MAIN);
 	m_BackgroundAngleEnd = End;
@@ -431,7 +431,7 @@ void EGArc::Event(EGEvent *pEvent)
       /*Do not allow big jumps (jumps bigger than 280°).
           *It's mainly to avoid jumping to the opposite end if the "dead" range between min. and max. is crossed.
           *Check which end was closer on the last valid press (m_CloseToMinimum) and prefer that end*/
-      if(LV_ABS(DeltaAngle) > 280) {
+      if(EG_ABS(DeltaAngle) > 280) {
         if(m_CloseToMinimum) Angle = 0;
         else Angle = RangeDeg;
       }
@@ -443,7 +443,7 @@ void EGArc::Event(EGEvent *pEvent)
       /* Prevent big jumps when the click goes from start to end angle in the invisible
           * part of the background pArc without being released */
       if(((PreviousCloseToMin == CLICK_CLOSER_TO_MIN_END) && (m_CloseToMinimum == CLICK_CLOSER_TO_MAX_END)) &&
-      ((CLICK_OUTSIDE_BG_ANGLES == m_InOut) && (LV_ABS(DeltaAngle) > 280))) Angle = 0;
+      ((CLICK_OUTSIDE_BG_ANGLES == m_InOut) && (EG_ABS(DeltaAngle) > 280))) Angle = 0;
       else if(((PreviousCloseToMin == CLICK_CLOSER_TO_MAX_END) && (m_CloseToMinimum == CLICK_CLOSER_TO_MIN_END)) &&
       (CLICK_OUTSIDE_BG_ANGLES == m_InOut)) Angle = RangeDeg;
       DeltaAngle = Angle - LastRelativeAngle;	// Calculate the slew rate limited angle based on change rate (degrees/sec)
@@ -744,8 +744,8 @@ EG_Coord_t knob_shadow_size = 0, knob_outline_size = 0;
 
 	knob_shadow_size += GetStyleShadowWidth(EG_PART_KNOB);
 	knob_shadow_size += GetStyleShadowSpread(EG_PART_KNOB);
-	knob_shadow_size += LV_ABS(GetStyleShadowOffsetX(EG_PART_KNOB));
-	knob_shadow_size += LV_ABS(GetStyleShadowOffsetY(EG_PART_KNOB));
+	knob_shadow_size += EG_ABS(GetStyleShadowOffsetX(EG_PART_KNOB));
+	knob_shadow_size += EG_ABS(GetStyleShadowOffsetY(EG_PART_KNOB));
 	knob_outline_size += GetStyleOutlineWidth(EG_PART_KNOB);
 	knob_outline_size += GetStyleOutlinePadding(EG_PART_KNOB);
 	return EG_MAX(knob_shadow_size, knob_outline_size);

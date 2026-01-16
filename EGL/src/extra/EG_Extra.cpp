@@ -37,7 +37,7 @@ void EG_InitialiseExtra(void)
 
 
 #if EG_USE_MSG
-	EGMessage::Initialise();
+	EGMessageExec::Initialise();
 #endif
 
 #if EG_USE_FS_FATFS != '\0'

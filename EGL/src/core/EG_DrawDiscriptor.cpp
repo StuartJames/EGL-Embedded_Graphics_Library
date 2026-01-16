@@ -317,7 +317,7 @@ EG_Coord_t Size = 0;
 		if(GetStyleShadowOPA(Part) > EG_OPA_MIN) {
 			ShadowWidth = ShadowWidth / 2 + 1; // The blur adds only half width
 			ShadowWidth += GetStyleShadowSpread(Part);
-			ShadowWidth += EG_MAX(LV_ABS(GetStyleShadowOffsetX(Part)), LV_ABS(GetStyleShadowOffsetY(Part)));
+			ShadowWidth += EG_MAX(EG_ABS(GetStyleShadowOffsetX(Part)), EG_ABS(GetStyleShadowOffsetY(Part)));
 			Size = EG_MAX(Size, ShadowWidth);
 		}
 	}

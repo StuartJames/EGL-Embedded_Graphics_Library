@@ -227,7 +227,7 @@ void DrawMaskSetLinePoints(MaskLineParam_t *pParam, EG_Coord_t Point1X, EG_Coord
 	pParam->cfg.Side = Side;
 	pParam->Origin.m_X = Point1X;
 	pParam->Origin.m_Y = Point1Y;
-	pParam->Flat = (LV_ABS(Point2X - Point1X) > LV_ABS(Point2Y - Point1Y)) ? 1 : 0;
+	pParam->Flat = (EG_ABS(Point2X - Point1X) > EG_ABS(Point2Y - Point1Y)) ? 1 : 0;
 	pParam->SteepYX = 0;
 	pParam->SteepXY = 0;
 	pParam->dsc.DrawCB = (DrawMaskCB)DrawMaskLine;
@@ -304,7 +304,7 @@ void DrawMaskSetAngle(MaskAngleParam_t *pParam, EG_Coord_t vertex_x, EG_Coord_t 
 		pParam->DeltaDeg = 360 - StartAngle + EndAngle;
 	}
 	else {
-		pParam->DeltaDeg = LV_ABS(EndAngle - StartAngle);
+		pParam->DeltaDeg = EG_ABS(EndAngle - StartAngle);
 	}
 	pParam->cfg.StartAngle = StartAngle;
 	pParam->cfg.EndAngle = EndAngle;
@@ -1021,7 +1021,7 @@ static DrawMaskRes_t EG_ATTRIBUTE_FAST_MEM DrawMaskPolygon(EG_OPA_t *pMaskArray,
 	for(i = 0; i < pParam->cfg.PointCount; i++) {
 		EGPoint Point1 = pParam->cfg.pPoints[i];
 		EGPoint Point2 = pParam->cfg.pPoints[i + 1 < pParam->cfg.PointCount ? i + 1 : 0];
-		int pdiff = Point1.m_Y - Point2.m_Y, psign = pdiff / LV_ABS(pdiff);
+		int pdiff = Point1.m_Y - Point2.m_Y, psign = pdiff / EG_ABS(pdiff);
 		if(pdiff > 0) {
 			if(AbsY > Point1.m_Y || AbsY < Point2.m_Y) continue;
 			lines[line_cnt].Point1 = Point2;

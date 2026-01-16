@@ -132,7 +132,7 @@ void EGRoller::SetSelected(uint16_t SelectedItem, EG_AnimateEnable_e Enable)
 			uint16_t ActiveItem = m_CurrentItemIndex - CurrentPage * RealCount;
 			int32_t SelectedItemSigned = SelectedItem;
 			// Huge jump? Probably from last to first or first to last item.
-			if(LV_ABS((int16_t)ActiveItem - SelectedItem) > RealCount / 2) {
+			if(EG_ABS((int16_t)ActiveItem - SelectedItem) > RealCount / 2) {
 				if(ActiveItem > SelectedItem)	SelectedItemSigned += RealCount;
 				else SelectedItemSigned -= RealCount;
 			}

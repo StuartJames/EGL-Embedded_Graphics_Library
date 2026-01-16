@@ -115,7 +115,7 @@ public:
   static EGStyleProperty_e  m_StyleCrossPlace;
   static EGStyleProperty_e  m_StyleTrackPlace;
   static EGStyleProperty_e  m_StyleGrow;
-  static uint32_t           m_LayoutReference;
+  static uint32_t           m_Reference;
 
 private:
   int32_t       FindTrackEnd(EGObject *pObject, int32_t item_start_id, EG_Coord_t max_main_size,

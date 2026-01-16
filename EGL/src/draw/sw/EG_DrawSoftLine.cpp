@@ -214,11 +214,11 @@ EGPoint PointA, PointB;
 	}
 	int32_t xdiff = PointB.m_X - PointA.m_X;
 	int32_t ydiff = PointB.m_Y - PointA.m_Y;
-	bool flat = LV_ABS(xdiff) > LV_ABS(ydiff) ? true : false;
+	bool flat = EG_ABS(xdiff) > EG_ABS(ydiff) ? true : false;
 	int32_t Width = pDrawLine->m_Width;
 	int32_t wcorr_i = 0;
-	if(flat) wcorr_i = (LV_ABS(ydiff) << 5) / LV_ABS(xdiff);
-	else wcorr_i = (LV_ABS(xdiff) << 5) / LV_ABS(ydiff);
+	if(flat) wcorr_i = (EG_ABS(ydiff) << 5) / EG_ABS(xdiff);
+	else wcorr_i = (EG_ABS(xdiff) << 5) / EG_ABS(ydiff);
 	Width = (Width * wcorr[wcorr_i] + 63) >> 7; // + 63 for rounding
 	int32_t HalfWidthA = Width >> 1;
 	int32_t HalfWidthB = HalfWidthA + (Width & 0x1); // Compensate rounding error

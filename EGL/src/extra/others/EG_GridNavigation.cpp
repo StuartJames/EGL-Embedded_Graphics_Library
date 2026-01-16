@@ -87,7 +87,7 @@ void EGGridNav::EventCB(EGEvent *pEvent)
       EGObject *pGuess = nullptr;
       switch(Key){
         case EG_KEY_RIGHT: {
-          if((pGridNav->m_Control & LV_GRIDNAV_CTRL_SCROLL_FIRST) && pGridNav->m_pFocused->HasFlagSet(EG_OBJ_FLAG_SCROLLABLE) &&
+          if((pGridNav->m_Control & EG_GRIDNAV_CTRL_SCROLL_FIRST) && pGridNav->m_pFocused->HasFlagSet(EG_OBJ_FLAG_SCROLLABLE) &&
               pGridNav->m_pFocused->GetScrollRight() > 0) {
             EG_Coord_t d = pGridNav->m_pFocused->GetWidth() / 4;
             if(d <= 0) d = 1;
@@ -96,7 +96,7 @@ void EGGridNav::EventCB(EGEvent *pEvent)
           else {
             pGuess = pGridNav->FindChild(pObj, pGridNav->m_pFocused, FIND_RIGHT);
             if(pGuess == NULL) {
-              if(pGridNav->m_Control & LV_GRIDNAV_CTRL_ROLLOVER) {
+              if(pGridNav->m_Control & EG_GRIDNAV_CTRL_ROLLOVER) {
                 pGuess = pGridNav->FindChild(pObj, pGridNav->m_pFocused, FIND_NEXT_ROW_FIRST_ITEM);
                 if(pGuess == NULL) pGuess = pGridNav->FindFirstFocusable(pObj);
               }
@@ -106,7 +106,7 @@ void EGGridNav::EventCB(EGEvent *pEvent)
           break;
         }
         case EG_KEY_LEFT: {
-          if((pGridNav->m_Control & LV_GRIDNAV_CTRL_SCROLL_FIRST) && pGridNav->m_pFocused->HasFlagSet(EG_OBJ_FLAG_SCROLLABLE) &&
+          if((pGridNav->m_Control & EG_GRIDNAV_CTRL_SCROLL_FIRST) && pGridNav->m_pFocused->HasFlagSet(EG_OBJ_FLAG_SCROLLABLE) &&
               pGridNav->m_pFocused->GetScrollLeft() > 0) {
             EG_Coord_t d = pGridNav->m_pFocused->GetWidth() / 4;
             if(d <= 0) d = 1;
@@ -115,7 +115,7 @@ void EGGridNav::EventCB(EGEvent *pEvent)
           else {
             pGuess = pGridNav->FindChild(pObj, pGridNav->m_pFocused, FIND_LEFT);
             if(pGuess == NULL) {
-              if(pGridNav->m_Control & LV_GRIDNAV_CTRL_ROLLOVER) {
+              if(pGridNav->m_Control & EG_GRIDNAV_CTRL_ROLLOVER) {
                 pGuess = pGridNav->FindChild(pObj, pGridNav->m_pFocused, FIND_PREV_ROW_LAST_ITEM);
                 if(pGuess == NULL) pGuess = pGridNav->FindLastFocusable(pObj);
               }
@@ -125,7 +125,7 @@ void EGGridNav::EventCB(EGEvent *pEvent)
           break;
         }
         case EG_KEY_DOWN: {
-          if((pGridNav->m_Control & LV_GRIDNAV_CTRL_SCROLL_FIRST) && pGridNav->m_pFocused->HasFlagSet(EG_OBJ_FLAG_SCROLLABLE) &&
+          if((pGridNav->m_Control & EG_GRIDNAV_CTRL_SCROLL_FIRST) && pGridNav->m_pFocused->HasFlagSet(EG_OBJ_FLAG_SCROLLABLE) &&
               pGridNav->m_pFocused->GetScrollBottom() > 0) {
             EG_Coord_t d = pGridNav->m_pFocused->GetHeight() / 4;
             if(d <= 0) d = 1;
@@ -134,7 +134,7 @@ void EGGridNav::EventCB(EGEvent *pEvent)
           else {
             pGuess = pGridNav->FindChild(pObj, pGridNav->m_pFocused, FIND_BOTTOM);
             if(pGuess == NULL) {
-              if(pGridNav->m_Control & LV_GRIDNAV_CTRL_ROLLOVER) {
+              if(pGridNav->m_Control & EG_GRIDNAV_CTRL_ROLLOVER) {
                 pGuess = pGridNav->FindChild(pObj, pGridNav->m_pFocused, FIND_FIRST_ROW);
               }
               else {
@@ -145,7 +145,7 @@ void EGGridNav::EventCB(EGEvent *pEvent)
           break;
         }
         case EG_KEY_UP: {
-          if((pGridNav->m_Control & LV_GRIDNAV_CTRL_SCROLL_FIRST) && pGridNav->m_pFocused->HasFlagSet(EG_OBJ_FLAG_SCROLLABLE) &&
+          if((pGridNav->m_Control & EG_GRIDNAV_CTRL_SCROLL_FIRST) && pGridNav->m_pFocused->HasFlagSet(EG_OBJ_FLAG_SCROLLABLE) &&
               pGridNav->m_pFocused->GetScrollTop() > 0) {
             EG_Coord_t d = pGridNav->m_pFocused->GetHeight() / 4;
             if(d <= 0) d = 1;
@@ -154,7 +154,7 @@ void EGGridNav::EventCB(EGEvent *pEvent)
           else {
             pGuess = pGridNav->FindChild(pObj, pGridNav->m_pFocused, FIND_TOP);
             if(pGuess == NULL) {
-              if(pGridNav->m_Control & LV_GRIDNAV_CTRL_ROLLOVER) {
+              if(pGridNav->m_Control & EG_GRIDNAV_CTRL_ROLLOVER) {
                 pGuess = pGridNav->FindChild(pObj, pGridNav->m_pFocused, FIND_LAST_ROW);
               }
               else {
@@ -264,13 +264,13 @@ EGObject* EGGridNav::FindChild(EGObject *pObj, EGObject *pStartChild, EG_FindMod
 				ErrorX = GetCenterX(pChild) - StartX;
 				ErrorY = GetCenterY(pChild) - StartY;
 				if(ErrorX >= 0) continue;             /*It's on the right*/
-				if(LV_ABS(ErrorY) > HalfHeight) continue; /*Too far*/
+				if(EG_ABS(ErrorY) > HalfHeight) continue; /*Too far*/
 				break;
 			case FIND_RIGHT:
 				ErrorX = GetCenterX(pChild) - StartX;
 				ErrorY = GetCenterY(pChild) - StartY;
 				if(ErrorX <= 0) continue;             /*It's on the left*/
-				if(LV_ABS(ErrorY) > HalfHeight) continue; /*Too far*/
+				if(EG_ABS(ErrorY) > HalfHeight) continue; /*Too far*/
 				break;
 			case FIND_TOP:
 				ErrorX = GetCenterX(pChild) - StartX;

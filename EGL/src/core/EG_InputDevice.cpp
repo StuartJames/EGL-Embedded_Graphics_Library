@@ -1000,19 +1000,19 @@ void EGInputDevice::Gesture(EG_ProcessedInput_t *pProcess)
 		pGestureObj = pGestureObj->GetParent();
 	}
 	if(pGestureObj == nullptr) return;
-	if((LV_ABS(pProcess->Pointer.Vector.m_X) < m_pDriver->m_GestureMinVelocity) &&
-		  (LV_ABS(pProcess->Pointer.Vector.m_Y) < m_pDriver->m_GestureMinVelocity)) {
+	if((EG_ABS(pProcess->Pointer.Vector.m_X) < m_pDriver->m_GestureMinVelocity) &&
+		  (EG_ABS(pProcess->Pointer.Vector.m_Y) < m_pDriver->m_GestureMinVelocity)) {
 		pProcess->Pointer.GestureSum.m_X = 0;
 		pProcess->Pointer.GestureSum.m_Y = 0;
 	}
 	// Count the movement by gesture
 	pProcess->Pointer.GestureSum.m_X += pProcess->Pointer.Vector.m_X;
 	pProcess->Pointer.GestureSum.m_Y += pProcess->Pointer.Vector.m_Y;
-	if((LV_ABS(pProcess->Pointer.GestureSum.m_X) > m_pDriver->m_GestureLimit) ||
-		  (LV_ABS(pProcess->Pointer.GestureSum.m_Y) > m_pDriver->m_GestureLimit)) {
+	if((EG_ABS(pProcess->Pointer.GestureSum.m_X) > m_pDriver->m_GestureLimit) ||
+		  (EG_ABS(pProcess->Pointer.GestureSum.m_Y) > m_pDriver->m_GestureLimit)) {
 		pProcess->Pointer.GestureSent = 1;
 
-		if(LV_ABS(pProcess->Pointer.GestureSum.m_X) > LV_ABS(pProcess->Pointer.GestureSum.m_Y)) {
+		if(EG_ABS(pProcess->Pointer.GestureSum.m_X) > EG_ABS(pProcess->Pointer.GestureSum.m_Y)) {
 			if(pProcess->Pointer.GestureSum.m_X > 0)
 				pProcess->Pointer.GestureDirection = EG_DIR_RIGHT;
 			else

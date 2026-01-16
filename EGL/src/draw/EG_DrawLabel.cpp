@@ -117,7 +117,7 @@ void EG_ATTRIBUTE_FAST_MEM EGDrawLabel::Draw(const EGDrawContext  *pDrawContext,
 	uint32_t LineStart = 0;
 	int32_t LastLineStart = -1;
 	if(Hint && OffsetY == 0 && pRect->GetY1() < 0) {	// Check the Hint to use the cached info
-		if(LV_ABS(Hint->CoordY - pRect->GetY1()) > EG_LABEL_HINT_UPDATE_TH - 2 * LineHeight) {
+		if(EG_ABS(Hint->CoordY - pRect->GetY1()) > EG_LABEL_HINT_UPDATE_TH - 2 * LineHeight) {
 			Hint->LineStart = -1;		// If the label changed too much recalculate the Hint.
 		}
 		LastLineStart = Hint->LineStart;

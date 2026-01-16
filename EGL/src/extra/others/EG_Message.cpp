@@ -29,25 +29,37 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 EG_EventCode_e EG_EVENT_MSG_RECEIVED;
-EGList  EGMessage::m_MessageList;
+EGList  EGMessageExec::m_MessageList;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-EGMessage::~EGMessage(void)
+EGMessage::EGMessage(void) :
+  m_ID(0),
+  m_pExtData(nullptr),
+  m_pPrivateData(nullptr),
+  m_pPayload(nullptr)
+{
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// MessageExec
+///////////////////////////////////////////////////////////////////////////////
+
+EGMessageExec::~EGMessageExec(void)
 {
   m_MessageList.RemoveAll();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void EGMessage::Initialise(void)
+void EGMessageExec::Initialise(void)
 {
 	EG_EVENT_MSG_RECEIVED = EGEvent::GenerateNewID();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-SubscribeDiscriptor_t* EGMessage::Subsribe(uint32_t MessageID, EG_MessageSubscribeCB_t SubscribeCB, void *pExtData)
+SubscribeDiscriptor_t* EGMessageExec::Subsribe(uint32_t MessageID, EG_MessageSubscribeCB_t SubscribeCB, void *pExtData)
 {
   SubscribeDiscriptor_t *pSubscribe = (SubscribeDiscriptor_t*)EG_AllocMem(sizeof(SubscribeDiscriptor_t));
 	EG_ASSERT_MALLOC(pSubscribe);
@@ -62,7 +74,7 @@ SubscribeDiscriptor_t* EGMessage::Subsribe(uint32_t MessageID, EG_MessageSubscri
 
 ///////////////////////////////////////////////////////////////////////////////
 
-SubscribeDiscriptor_t* EGMessage::SubsribeObj(uint32_t MessageID, EGObject *pObj, void *pExtData)
+SubscribeDiscriptor_t* EGMessageExec::SubsribeObj(uint32_t MessageID, EGObject *pObj, void *pExtData)
 {
 	SubscribeDiscriptor_t *pSubscribe = Subsribe(MessageID, (EG_MessageSubscribeCB_t)NotifyObjCB, pExtData);
 	if(pSubscribe == nullptr) return nullptr;
@@ -77,7 +89,7 @@ SubscribeDiscriptor_t* EGMessage::SubsribeObj(uint32_t MessageID, EGObject *pObj
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void EGMessage::Unsubscribe(void *pSubscribe)
+void EGMessageExec::Unsubscribe(void *pSubscribe)
 {
 POSITION Pos;
 
@@ -88,7 +100,7 @@ POSITION Pos;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-uint32_t EGMessage::UnsubscribeObj(uint32_t MessageID, EGObject *pObj)
+uint32_t EGMessageExec::UnsubscribeObj(uint32_t MessageID, EGObject *pObj)
 {
 uint32_t cnt = 0;
 
@@ -105,21 +117,10 @@ uint32_t cnt = 0;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void EGMessage::Send(uint32_t MessageID, const void *pPayload)
-{
-  EG_Message_t Message;
-	EG_ZeroMem(&Message, sizeof(EG_Message_t));
-	Message.ID = MessageID;
-	Message.pPayload = pPayload;
-	Notify(&Message);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-EG_Message_t* EGMessage::GetMessage(EGEvent *pEvent)
+EGMessage* EGMessageExec::GetMessage(EGEvent *pEvent)
 {
 	if(pEvent->m_EventCode == EG_EVENT_MSG_RECEIVED) {
-		return (EG_Message_t*)pEvent->m_pParam;
+		return (EGMessage*)pEvent->m_pParam;
 	}
 	else {
 		EG_LOG_WARN("Not interpreted with this event code");
@@ -129,36 +130,25 @@ EG_Message_t* EGMessage::GetMessage(EGEvent *pEvent)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-uint32_t EGMessage::GetID(EG_Message_t *pMessage)
+void EGMessageExec::Notify(uint32_t MessageID, const void *pPayload)
 {
-	return pMessage->ID;
+  EGMessage Message;
+	Message.m_ID = MessageID;
+	Message.m_pPayload = pPayload;
+	EGMessageExec::Distribute(&Message);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-const void* EGMessage::GetPayload(EG_Message_t *pMessage)
-{
-	return pMessage->pPayload;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-void* EGMessage::GetExtData(EG_Message_t *pMessage)
-{
-	return pMessage->pExtData;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-void EGMessage::Notify(EG_Message_t *pMessage)
+void EGMessageExec::Distribute(EGMessage *pMessage)  // distribute to all subscribers
 {
 POSITION Pos;
 SubscribeDiscriptor_t *pSub;
 
 	for(pSub = (SubscribeDiscriptor_t*)m_MessageList.GetHead(Pos); pSub != nullptr; pSub = (SubscribeDiscriptor_t*)m_MessageList.GetNext(Pos)){
-		if(pSub->MessageID == pMessage->ID && pSub->Callback) {
-			pMessage->pExtData = pSub->pExtData;
-			pMessage->pPrivateData = pSub->pPrivateData;
+		if(pSub->MessageID == pMessage->m_ID && pSub->Callback) {
+			pMessage->m_pExtData = pSub->pExtData;
+			pMessage->m_pPrivateData = pSub->pPrivateData;
 			pSub->Callback(pSub, pMessage);
 		}
 	}
@@ -166,16 +156,16 @@ SubscribeDiscriptor_t *pSub;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void EGMessage::NotifyObjCB(void *pSubscribe, EG_Message_t *pMessage)
+void EGMessageExec::NotifyObjCB(void *pSubscribe, EGMessage *pMessage)
 {
 EG_UNUSED(pSubscribe);
 
-	EGEvent::EventSend((EGObject*)pMessage->pPrivateData, EG_EVENT_MSG_RECEIVED, pMessage);
+	EGEvent::EventSend((EGObject*)pMessage->m_pPrivateData, EG_EVENT_MSG_RECEIVED, pMessage);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void EGMessage::DeleteObjEventCB(EGEvent *pEvent)
+void EGMessageExec::DeleteObjEventCB(EGEvent *pEvent)
 {
 SubscribeDiscriptor_t *pSub;
 

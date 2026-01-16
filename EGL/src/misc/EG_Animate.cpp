@@ -188,7 +188,7 @@ uint16_t EGAnimate::RunningCount(void)
 
 uint32_t EGAnimate::SpeedToTime(uint32_t Speed, int32_t Start, int32_t End)
 {
-uint32_t Duration = LV_ABS(Start - End);
+uint32_t Duration = EG_ABS(Start - End);
 uint32_t Time = (Duration * 1000) / Speed;
 
 	if(Time == 0) Time++;

@@ -133,8 +133,8 @@ void EGSlider::Event(EGEvent *pEvent)
           }
           else {
             // Calculate the distance from each knob
-            LeftDistance = LV_ABS((m_LeftKnobRect.GetX1() + (m_LeftKnobRect.GetX2() - m_LeftKnobRect.GetX1()) / 2) - Point.m_X);
-            RightDistance = LV_ABS((m_RightKnobRect.GetX1() + (m_RightKnobRect.GetX2() - m_RightKnobRect.GetX1()) / 2) - Point.m_X);
+            LeftDistance = EG_ABS((m_LeftKnobRect.GetX1() + (m_LeftKnobRect.GetX2() - m_LeftKnobRect.GetX1()) / 2) - Point.m_X);
+            RightDistance = EG_ABS((m_RightKnobRect.GetX1() + (m_RightKnobRect.GetX2() - m_RightKnobRect.GetX1()) / 2) - Point.m_X);
             if(RightDistance < LeftDistance) {				// Use whichever one is closer
               m_pValueToSet = &m_CurrentValue;
               m_LeftKnobFocus = 0;
@@ -150,8 +150,8 @@ void EGSlider::Event(EGEvent *pEvent)
           else if(Point.m_Y > m_LeftKnobRect.GetY2()) m_pValueToSet = &m_StartValue;
           else {
             // Calculate the distance from each knob
-            LeftDistance = LV_ABS((m_LeftKnobRect.GetY1() + (m_LeftKnobRect.GetY2() - m_LeftKnobRect.GetY1()) / 2) - Point.m_Y);
-            RightDistance = LV_ABS((m_RightKnobRect.GetY1() + (m_RightKnobRect.GetY2() - m_RightKnobRect.GetY1()) / 2) - Point.m_Y);
+            LeftDistance = EG_ABS((m_LeftKnobRect.GetY1() + (m_LeftKnobRect.GetY2() - m_LeftKnobRect.GetY1()) / 2) - Point.m_Y);
+            RightDistance = EG_ABS((m_RightKnobRect.GetY1() + (m_RightKnobRect.GetY2() - m_RightKnobRect.GetY1()) / 2) - Point.m_Y);
 
             // Use whichever one is closer
             if(RightDistance < LeftDistance) {

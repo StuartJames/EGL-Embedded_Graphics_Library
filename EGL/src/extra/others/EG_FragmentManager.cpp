@@ -26,26 +26,27 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-EGList EGFragmentManager::m_Attached;  
-EGList EGFragmentManager::m_Stack;        
 
 ///////////////////////////////////////////////////////////////////////////////
 
-EGFragmentManager::EGFragmentManager(EGFragment *pParent)
+EGFragmentExec::EGFragmentExec(EGFragment *pParent)
 {
 	m_pParent = pParent;
+  m_Attached.Initialise();  
+  m_Stack.Initialise();        
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-EGFragmentManager::~EGFragmentManager(void)
+EGFragmentExec::~EGFragmentExec(void)
 {
 POSITION Pos = nullptr;
-FragmentStates_t *pStates;
+EGFragment *pFragment;
 
-	for(pStates = (FragmentStates_t*)m_Attached.GetTail(Pos); pStates != nullptr; pStates = (FragmentStates_t*)m_Attached.GetPrev(Pos)){
-		ItemDeleteObj(pStates);
-		ItemDeleteFragment(pStates);
+	for(pFragment = (EGFragment*)m_Attached.GetTail(Pos); pFragment != nullptr; pFragment = (EGFragment*)m_Attached.GetPrev(Pos)){
+    pFragment->Destroy();
+    pFragment->Detached();
+	  pFragment->m_Managed = false;
 	}
   m_Attached.RemoveAll();
   m_Stack.RemoveAll();
@@ -53,215 +54,165 @@ FragmentStates_t *pStates;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void EGFragmentManager::CreateObj(void)
+void EGFragmentExec::CreateObj(void)
 {
 POSITION Pos = nullptr;
-FragmentStates_t *pStates = nullptr;
+EGFragment *pFragment = nullptr;
 
-	StackItem_t *pTop = (StackItem_t*)m_Stack.GetTail();
-	for(pStates = (FragmentStates_t*)m_Attached.GetTail(Pos); pStates != nullptr; pStates = (FragmentStates_t*)m_Attached.GetPrev(Pos)){
-		if(pStates->InStack && pTop->pStates != pStates) {
-			continue;			// Only create obj for top item in stack
-		}
-		ItemCreateObj(pStates);
+	EGFragment *pTop = (EGFragment*)m_Stack.GetTail();
+	for(pFragment = (EGFragment*)m_Attached.GetTail(Pos); pFragment != nullptr; pFragment = (EGFragment*)m_Attached.GetPrev(Pos)){
+		if(pFragment->m_InStack && pTop != pFragment) 	continue;		// Only create obj for top item in stack
+    pFragment->Create(pFragment->m_pContainer);
 	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void EGFragmentManager::DeleteObj(void)
+void EGFragmentExec::DeleteObj(void)
 {
 POSITION Pos = nullptr;
-FragmentStates_t *pStates = nullptr;
+EGFragment *pFragment = nullptr;
 
-	for(pStates = (FragmentStates_t*)m_Attached.GetTail(Pos); pStates != nullptr; pStates = (FragmentStates_t*)m_Attached.GetPrev(Pos)){
-		ItemDeleteObj(pStates);
+	for(pFragment = (EGFragment*)m_Attached.GetTail(Pos); pFragment != nullptr; pFragment = (EGFragment*)m_Attached.GetPrev(Pos)){
+  	pFragment->Destroy();
 	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void EGFragmentManager::Add(EGFragment *pFragment, EGObject *const *pContainer)
+void EGFragmentExec::Add(EGFragment *pFragment, EGObject *pContainer)
 {
-	FragmentStates_t *pStates = AttachFragment(pFragment, pContainer);
-	if(!m_pParent || m_pParent->m_pManaged->ObjCreated) {
-		ItemCreateObj(pStates);
-	}
+	AttachFragment(pFragment, pContainer);
+	if(!m_pParent || m_pParent->m_ContentCreated) pFragment->Create(pFragment->m_pContainer);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void EGFragmentManager::Remove(EGFragment *pFragment)
+void EGFragmentExec::Remove(EGFragment *pFragment)
 {
 POSITION Pos = nullptr;
+EGFragment *pPrevious = nullptr, *pItem = nullptr;
+bool WasTop = false;
 
 	EG_ASSERT_NULL(pFragment);
-	EG_ASSERT_NULL(pFragment->m_pManaged);
-	EG_ASSERT(pFragment->m_pManaged->pManager == this);
-	FragmentStates_t *pStates = pFragment->m_pManaged;
-	FragmentStates_t *pPrevious = NULL;
-	bool WasTop = false;
-	if(pStates->InStack) {
-		StackItem_t *pStackTop = (StackItem_t*)m_Stack.GetTail();
-		StackItem_t *pItem = nullptr;
-	  for(pItem = (StackItem_t*)m_Stack.GetTail(Pos); pItem != nullptr; pItem = (StackItem_t*)m_Stack.GetPrev(Pos)){
-			if(pItem->pStates == pStates) {
-				WasTop = pStackTop == pItem;
-				StackItem_t *pStackPrev = (StackItem_t*)m_Stack.GetPrev(Pos);
+	EG_ASSERT(pFragment->m_Managed = true);
+	EG_ASSERT(pFragment->m_pManager == this);
+	if(pFragment->m_InStack) {
+		EGFragment *pStackTop = (EGFragment*)m_Stack.GetTail();
+	  for(pItem = (EGFragment*)m_Stack.GetTail(Pos); pItem != nullptr; pItem = (EGFragment*)m_Stack.GetPrev(Pos)){
+			if(pItem == pFragment) {
+				WasTop = (pStackTop == pItem) ? true : false;  // was it the active fragment
+				EGFragment *pStackPrev = (EGFragment*)m_Stack.GetPrev(Pos);
 				if(!pStackPrev) break;
-				pPrevious = ((StackItem_t *)pStackPrev)->pStates;
+				pPrevious = pStackPrev;
 				break;
 			}
-		}
-		if(pItem) {
-      if((Pos = m_Stack.Find(pItem)) != nullptr) m_Stack.RemoveAt(Pos);
-			EG_FreeMem(pItem);
-		}
+		}       // if it was found remove it from the stack
+		if(pItem) if((Pos = m_Stack.Find(pItem)) != nullptr) m_Stack.RemoveAt(Pos);
 	}
-	ItemDeleteObj(pStates);
-	ItemDeleteFragment(pStates);
-  if((Pos = m_Attached.Find(pStates)) != nullptr) m_Attached.RemoveAt(Pos);
-	EG_FreeMem(pStates);
-	if(pPrevious && WasTop) {
-		ItemCreateObj(pPrevious);
-	}
+	pFragment->Destroy();
+  pFragment->Detached();
+	pFragment->m_Managed = false;
+  if((Pos = m_Attached.Find(pFragment)) != nullptr) m_Attached.RemoveAt(Pos);
+	delete pFragment;
+	if(pPrevious && WasTop) pPrevious->Create(pPrevious->m_pContainer);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void EGFragmentManager::Push(EGFragment *pFragment, EGObject *const *pContainer)
+void EGFragmentExec::Push(EGFragment *pFragment, EGObject *pContainer)
 {
-  StackItem_t *pStackTop = (StackItem_t*)m_Stack.GetTail();
+  EGFragment *pStackTop = (EGFragment*)m_Stack.GetTail();
   if(pStackTop != nullptr) {
-		ItemDeleteObj(pStackTop->pStates);
+	  pStackTop->Destroy();
 	}
-	FragmentStates_t *pStates = AttachFragment(pFragment, pContainer);
-	pStates->InStack = true;
-	StackItem_t *pItem = (StackItem_t*)EG_AllocMem(sizeof(StackItem_t));
-	EG_ZeroMem(pItem, sizeof(StackItem_t));
-  m_Stack.AddTail(pItem);	// Add fragment to the top of the stack
-	pItem->pStates = pStates;
-	ItemCreateObj(pStates);
+	AttachFragment(pFragment, pContainer);
+	pFragment->m_InStack = true;
+  m_Stack.AddTail(pFragment);	// Add fragment to the top of the stack
+	pFragment->Create(pFragment->m_pContainer);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool EGFragmentManager::Pop(void)
+bool EGFragmentExec::Pop(void)
 {
-	EGFragment *pTop = GetTop();
-	if(pTop == NULL) return false;
-	Remove(pTop);
+  EGFragment *pFragment = (EGFragment*)m_Stack.GetTail();
+	if(pFragment == nullptr) return false;
+	Remove(pFragment);
 	return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void EGFragmentManager::Replace(EGFragment *pFragment, EGObject *const *pContainer)
+void EGFragmentExec::Replace(EGFragment *pFragment, EGObject *pContainer)
 {
-	EGFragment *pTop = FindByContainer(*pContainer);
+	EGFragment *pTop = FindByContainer(pContainer);
 	if(pTop != nullptr) Remove(pTop);
 	Add(pFragment, pContainer);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool EGFragmentManager::SendEvent(EGFragmentManager *pManager, int Code, void *pExtData)
+bool EGFragmentExec::SendEvent(EGFragmentExec *pManager, int Code, void *pExtData)
 {
-FragmentStates_t *pStates = nullptr;
+EGFragment *pFragment = nullptr;
 POSITION Pos = nullptr;
 
-  for(pStates = (FragmentStates_t*)pManager->m_Attached.GetTail(Pos); pStates != nullptr; pStates = (FragmentStates_t*)pManager->m_Attached.GetPrev(Pos)){
-		if(!pStates->ObjCreated || pStates->DestroyingObj) continue;
-		EGFragment *pInstance = pStates->pInstance;
-		if(!pInstance) continue;
-		if(SendEvent(pInstance->m_pChildManager, Code, pExtData)) return true;
-		if(pStates->pClass->EventCB && pStates->pClass->EventCB(pInstance, Code, pExtData)) return true;
+  for(pFragment = (EGFragment*)pManager->m_Attached.GetTail(Pos); pFragment != nullptr; pFragment = (EGFragment*)pManager->m_Attached.GetPrev(Pos)){
+		if(!pFragment->m_ContentCreated || pFragment->m_DestroyingContent) continue;
+		if(SendEvent(pFragment->m_pChildManager, Code, pExtData)) return true;
+		return pFragment->EventCB(Code, pExtData);
 	}
 	return false;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-size_t EGFragmentManager::GetStackSize(void)
+size_t EGFragmentExec::GetStackSize(void)
 {
 	return m_Stack.GetSize();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-EGFragment* EGFragmentManager::GetTop(void)
+EGFragment* EGFragmentExec::GetTop(void)
 {
-  StackItem_t *pStackTop = (StackItem_t*)m_Stack.GetTail();
-	if(!pStackTop) return nullptr;
-	return pStackTop->pStates->pInstance;
+  EGFragment *pFragment = (EGFragment*)m_Stack.GetTail();
+	return pFragment;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-EGFragment* EGFragmentManager::FindByContainer(const EGObject *pContainer)
+EGFragment* EGFragmentExec::FindByContainer(const EGObject *pContainer)
 {
 POSITION Pos = nullptr;
-FragmentStates_t *pStates;
+EGFragment *pFragment;
 
-  for(pStates = (FragmentStates_t*)m_Attached.GetTail(Pos); pStates != nullptr; pStates = (FragmentStates_t*)m_Attached.GetPrev(Pos)){
-		if(*pStates->pContainer == pContainer) return pStates->pInstance;
+  for(pFragment = (EGFragment*)m_Attached.GetTail(Pos); pFragment != nullptr; pFragment = (EGFragment*)m_Attached.GetPrev(Pos)){
+		if(pFragment->m_pContainer == pContainer) return pFragment;
 	}
-	return NULL;
+	return nullptr;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-EGFragment* EGFragmentManager::GetParentFragment(void)
+EGFragment* EGFragmentExec::GetParentFragment(void)
 {
 	return m_pParent;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void EGFragmentManager::ItemCreateObj(FragmentStates_t *pItem)
-{
-	EG_ASSERT(pItem->pInstance);
-	pItem->pInstance->CreateObj(pItem->pContainer ? *pItem->pContainer : nullptr);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-void EGFragmentManager::ItemDeleteObj(FragmentStates_t *pItem)
-{
-	pItem->pInstance->DeleteObj();
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-void EGFragmentManager::ItemDeleteFragment(FragmentStates_t *pItem)
-{
-	EGFragment *pInstance = pItem->pInstance;
-	if(pInstance->m_pClass->DetachedCB) {
-		pInstance->m_pClass->DetachedCB(pInstance);
-	}
-	pInstance->m_pManaged = nullptr;
-	delete pInstance;
-	pItem->pInstance = nullptr;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-FragmentStates_t* EGFragmentManager::AttachFragment(EGFragment *pFragment,	EGObject *const *pContainer)
+EGFragment* EGFragmentExec::AttachFragment(EGFragment *pFragment,	EGObject *pContainer)
 {
 	EG_ASSERT(pFragment);
-	EG_ASSERT(pFragment->m_pManaged == nullptr);
-	FragmentStates_t *pStates = (FragmentStates_t*)EG_AllocMem(sizeof(FragmentStates_t));
-	EG_ZeroMem(pStates, sizeof(FragmentStates_t));
-  m_Attached.AddTail(pStates);
-	pStates->pClass = pFragment->m_pClass;
-	pStates->pManager = this;
-	pStates->pContainer = pContainer;
-	pStates->pInstance = pFragment;
-	pFragment->m_pManaged = pStates;
-	if(pFragment->m_pClass->AttachedCB) {
-		pFragment->m_pClass->AttachedCB(pFragment);
-	}
-	return pStates;
+	EG_ASSERT(pFragment->m_pManager == nullptr);
+  m_Attached.AddTail(pFragment);
+	pFragment->m_pManager = this;
+	pFragment->m_pContainer = pContainer;
+	pFragment->m_Managed = true;
+	pFragment->Attached();
+	return pFragment;
 }
 
 #endif 

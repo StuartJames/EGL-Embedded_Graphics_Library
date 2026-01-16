@@ -333,7 +333,7 @@ void EGSpinBox::UpdateValue(void)
 	int32_t i;
 	char digits[EG_SPINBOX_MAX_DIGIT_COUNT + 4];
 	// Convert the numbers to string (the sign is already handled so always covert positive number)
-	eg_snprintf(digits, sizeof(digits), "%" EG_PRId32, LV_ABS(m_Value));
+	eg_snprintf(digits, sizeof(digits), "%" EG_PRId32, EG_ABS(m_Value));
 	int lz_cnt = m_DigitCount - (int)strlen(digits);	// Add leading zeros
 	if(lz_cnt > 0) {
 		for(i = (uint16_t)strlen(digits); i >= 0; i--) {

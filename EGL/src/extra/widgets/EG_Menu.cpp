@@ -216,7 +216,7 @@ EGMenu::~EGMenu(void)
 
 void EGMenu::Configure(void)
 {
-	SetLayout(EGFlexLayout::m_LayoutReference);
+	SetLayout(EGFlexLayout::m_Reference);
 	EGFlexLayout::SetObjFlow(this, EG_FLEX_FLOW_ROW);
 	m_ModeHeader = EG_MENU_HEADER_TOP_FIXED;
 	m_RootBackButtonMode = EG_MENU_ROOT_BACK_BTN_DISABLED;

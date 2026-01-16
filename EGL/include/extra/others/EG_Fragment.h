@@ -32,70 +32,35 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 class EGFragment;
-class EGFragmentManager;
-
-typedef struct EGFragmentClass_t
-{
-	void        (*ConstructorCB)(EGFragment *self, void *args);
-	void        (*DestructorCB)(EGFragment *self);
-	void        (*AttachedCB)(EGFragment *self); // Fragment attached to manager
-	void        (*DetachedCB)(EGFragment *self);	// Fragment detached from manager
-	EGObject*   (*CreateObjCB)(EGFragment *self, EGObject *pContainer);
-	void        (*ObjCreatedCB)(EGFragment *self, EGObject *obj);
-	void        (*ObjWillDeleteCB)(EGFragment *self, EGObject *obj);// Called before objects in the fragment will be deleted.
-	void        (*ObjDeletedCB)(EGFragment *self, EGObject *obj);   // Called when the object created by fragment received `EG_EVENT_DELETE` event
-	bool        (*EventCB)(EGFragment *self, int code, void *userdata);
-
-	size_t      InstanceSize;
-} EGFragmentClass_t;
-
-
-typedef struct FragmentStates_t {
-	const EGFragmentClass_t *pClass;          // Class of the fragment
-	EGFragmentManager       *pManager;        // Manager the fragment is attached to
-	EGObject *const         *pContainer;	    // Container object the fragment adding view to
-	EGFragment              *pInstance;	      // Fragment instance
-	bool                    ObjCreated;       // true between `create_obj_cb` and `obj_deleted_cb`
-	bool                    DestroyingObj;	  // true before `lv_fragment_del_obj` is called. Don't touch any object if this is true
-	bool                    InStack;          // true if this fragment is in navigation stack that can be popped
-} FragmentStates_t;
-
-typedef struct StackItem_t {
-	FragmentStates_t *pStates;
-} StackItem_t;
-
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class EGFragmentManager
+class EGFragmentExec
 {
 public:
-	                    EGFragmentManager(void){};
-	                    EGFragmentManager(EGFragment *parent);
-	                    ~EGFragmentManager(void);
+	                    EGFragmentExec(void){};
+	                    EGFragmentExec(EGFragment *pParent);
+	                    ~EGFragmentExec(void);
   void                CreateObj(void);
   void                DeleteObj(void);
-  void                Add(EGFragment *pFragment, EGObject *const *pContainer);
+  void                Add(EGFragment *pFragment, EGObject *pContainer);
   void                Remove(EGFragment *pFragment);
-  void                Push(EGFragment *pFragment, EGObject *const *pContainer);
+  void                Push(EGFragment *pFragment, EGObject *pContainer);
   bool                Pop(void);
-  void                Replace(EGFragment *pFragment, EGObject *const *pContainer);
+  void                Replace(EGFragment *pFragment, EGObject *pContainer);
   size_t              GetStackSize(void);
   EGFragment*         GetTop(void);
   EGFragment*         FindByContainer(const EGObject *pContainer);
   EGFragment*         GetParentFragment(void);
 
-  static bool         SendEvent(EGFragmentManager *pManager, int Code, void *pExtData);
+  static bool         SendEvent(EGFragmentExec *pManager, int Code, void *pExtData);
 
 private:
-	void                ItemCreateObj(FragmentStates_t *item);
-	void                ItemDeleteObj(FragmentStates_t *item);
-	void                ItemDeleteFragment(FragmentStates_t *item);
-	FragmentStates_t*   AttachFragment(EGFragment *pFragment,	EGObject *const *pContainer);
+	EGFragment*         AttachFragment(EGFragment *pFragment,	EGObject *pContainer);
 
 	EGFragment          *m_pParent;
-	static EGList       m_Attached;      // Linked list to store attached fragments
-	static EGList       m_Stack;         // Linked list to store fragments in stack
+	EGList              m_Attached;      // Linked list to store attached fragments
+	EGList              m_Stack;         // Linked list to store fragments in stack
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -103,20 +68,37 @@ private:
 class EGFragment
 {
 public:
-                            EGFragment(const EGFragmentClass_t *pClass, void *pArgs);
-                            ~EGFragment(void);
-  EGFragmentManager*        GetManager(void);
+                            EGFragment(void *pArgs);
+  virtual                   ~EGFragment(void);
+  EGObject*                 Create(EGObject *pContainer);
+  void                      Destroy(void);
+  void                      Recreate(void);
+  EGFragmentExec*           GetManager(void);
   const EGObject*           GetContainer(void);
   EGFragment*               GetParent(void);
-  EGObject*                 CreateObj(EGObject *pContainer);
-  void                      DeleteObj(void);
-  void                      RecreateObj(void);
+
+  virtual void              Attached(void){}; // Fragment attached to manager
+  virtual void              Detached(void){};	// Fragment detached from manager
+  virtual EGObject*         CreateContent(EGObject *pContainer){ return nullptr; };
+  virtual void              ContentCreated(EGObject *pObj){};
+  virtual void              DeletingContent(EGObject *pObj){};// Called before objects in the fragment will be deleted.
+  virtual void              ContentDeleted(EGObject *pObj){};   // Called when the object created by fragment received `EG_EVENT_DELETE` event
+
+  static bool               EventCB(int Code, void *pExtData){ return false; };
+  static void               DeleteAssertionCB(EGEvent *event);
 
 
-	const EGFragmentClass_t   *m_pClass;	// Class of this fragment
-	FragmentStates_t          *m_pManaged;	// Managed fragment states. If not null, then this fragment is managed.
-	EGFragmentManager         *m_pChildManager;
-	EGObject                  *m_pObj;
+	bool                      m_Managed;	        // this fragment is managed.
+  EGFragmentExec            *m_pManager;
+	EGFragmentExec            *m_pChildManager;
+	EGObject                  *m_pContainer;	    // Container object the fragment adding view to
+	bool                      m_ContentCreated;       // true between `create_obj_cb` and `obj_deleted_cb`
+	bool                      m_DestroyingContent;	  // true before `lv_fragment_del_obj` is called. Don't touch any object if this is true
+	bool                      m_InStack;          // true if this fragment is in navigation stack that can be popped
+
+private:
+	EGObject                  *m_pContent;
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////

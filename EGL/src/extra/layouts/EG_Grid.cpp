@@ -42,7 +42,7 @@ EGStyleProperty_e   EGGridLayout::STYLE_CELL_ALIGN_X;
 EGStyleProperty_e   EGGridLayout::STYLE_CELL_ROW_POSITION;
 EGStyleProperty_e   EGGridLayout::STYLE_CELL_ROW_SPAN;
 EGStyleProperty_e   EGGridLayout::STYLE_CELL_ALIGN_Y;
-uint32_t            EGGridLayout::m_LayoutReference;
+uint32_t            EGGridLayout::m_Reference = 0;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -72,7 +72,7 @@ void EGGridLayout::Initialise(void)
 	STYLE_CELL_COLUMN_POSITION = EGStyle::RegisterProperty(EG_STYLE_PROP_LAYOUT_REFRESH);
 	STYLE_CELL_ALIGN_X = EGStyle::RegisterProperty(EG_STYLE_PROP_LAYOUT_REFRESH);
 	STYLE_CELL_ALIGN_Y = EGStyle::RegisterProperty(EG_STYLE_PROP_LAYOUT_REFRESH);
-	m_LayoutReference = EGObject::LayoutRegister(EGGridLayout::UpdateCB, nullptr);
+	m_Reference = EGObject::LayoutRegister(EGGridLayout::UpdateCB, nullptr);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -95,7 +95,7 @@ void EGGridLayout::SetObjGridParams(EGObject *pObj, const EG_Coord_t ColumnProps
 {
 	SetObjStyleColumnParams(pObj, ColumnProps, 0);
 	SetObjStyleRowParams(pObj, RowProps, 0);
-	pObj->SetStyleLayout(m_LayoutReference, 0);
+	pObj->SetStyleLayout(m_Reference, 0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

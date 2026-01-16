@@ -236,7 +236,7 @@ bool HorizontalEnable = false, VerticalEnable = false;
 			Zoom = (256 * 256) / Zoom;
 			ScrollSum.PointTransform(Angle, Zoom, &Pivot);
 		}
-		if(LV_ABS(ScrollSum.m_X) > LV_ABS(ScrollSum.m_Y)) HorizontalEnable = true; // Decide if it's a horizontal or vertical scroll
+		if(EG_ABS(ScrollSum.m_X) > EG_ABS(ScrollSum.m_Y)) HorizontalEnable = true; // Decide if it's a horizontal or vertical scroll
 		else VerticalEnable = true;
 		if(pActiveObj->HasFlagSet(EG_OBJ_FLAG_SCROLLABLE) == false) {
 			// If this object don't want to chain the scroll to the pParent stop searching
@@ -402,7 +402,7 @@ EG_Coord_t EGInputDevice::FindSnapPointX(EGObject *pObj, EG_Coord_t Min, EG_Coor
 			ChildX += Offset;
 			if(ChildX >= Min && ChildX <= Max) {
 				EG_Coord_t x = ChildX - ParentX;
-				if(LV_ABS(x) < LV_ABS(Distance)) Distance = x;
+				if(EG_ABS(x) < EG_ABS(Distance)) Distance = x;
 			}
 		}
 	}
@@ -444,7 +444,7 @@ EG_Coord_t EGInputDevice::FindSnapPointY(EGObject *pObj, EG_Coord_t Min, EG_Coor
 			ChildY += Offset;
 			if(ChildY >= Min && ChildY <= Max) {
 				EG_Coord_t y = ChildY - ParentY;
-				if(LV_ABS(y) < LV_ABS(Distance)) Distance = y;
+				if(EG_ABS(y) < EG_ABS(Distance)) Distance = y;
 			}
 		}
 	}

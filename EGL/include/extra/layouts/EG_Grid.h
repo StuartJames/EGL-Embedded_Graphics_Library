@@ -110,7 +110,7 @@ public:
   static EGStyleProperty_e    STYLE_CELL_ROW_POSITION;
   static EGStyleProperty_e    STYLE_CELL_ROW_SPAN;
   static EGStyleProperty_e    STYLE_CELL_ALIGN_Y;
-  static uint32_t             m_LayoutReference;
+  static uint32_t             m_Reference;
 
 private:
   void                        Clear(void);

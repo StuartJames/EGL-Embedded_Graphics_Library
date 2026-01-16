@@ -262,8 +262,8 @@ void EGColorWheel::Event(EGEvent *pEvent)
       }
       else pInput->GetPoint(&Point);
       EG_Coord_t drag_limit = pInput->m_pDriver->m_ScrollLimit;
-      if((LV_ABS(Point.m_X - m_LastPressPoint.m_X) > drag_limit) ||
-        (LV_ABS(Point.m_Y - m_LastPressPoint.m_Y) > drag_limit)) {
+      if((EG_ABS(Point.m_X - m_LastPressPoint.m_X) > drag_limit) ||
+        (EG_ABS(Point.m_Y - m_LastPressPoint.m_Y) > drag_limit)) {
         m_LastChangeTime = EG_GetTick();
         m_LastPressPoint.m_X = Point.m_X;
         m_LastPressPoint.m_Y = Point.m_Y;

@@ -32,14 +32,9 @@ EG_EXPORT_CONST_INT(LV_MSG_ID_ANY);
 
 ///////////////////////////////////////////////////////////////////////////////
 
-typedef struct EG_Message_t{
-  uint32_t       ID;            // Identifier of the message
-  void          *pExtData;       // Set the the user_data set in `lv_msg_subscribe`
-  void          *pPrivateData;  // Used internally
-  const void    *pPayload;      // Pointer to the data of the message
-} EG_Message_t;
+class EGMessage;
 
-typedef void (*EG_MessageSubscribeCB_t)(void *pSubscribe, EG_Message_t *pMessage);
+typedef void (*EG_MessageSubscribeCB_t)(void *pSubscribe, EGMessage *pMessage);
 typedef void (*EG_MessageRequestCB_t)(void *pRequest, uint32_t MessageID);
 
 typedef struct SubscribeDiscriptor_t{
@@ -56,25 +51,38 @@ extern EG_EventCode_e EG_EVENT_MSG_RECEIVED;
 class EGMessage
 {
 public:
-                          EGMessage(void) : m_pMessage(nullptr) {};
-                          ~EGMessage(void);
-  SubscribeDiscriptor_t*  Subsribe(uint32_t MessageID, EG_MessageSubscribeCB_t SubscribeCB, void *pExtData);
-  SubscribeDiscriptor_t*  SubsribeObj(uint32_t MessageID, EGObject *pObj, void *pExtData);
-  void                    Send(uint32_t MessageID, const void *pPayload);
-  EG_Message_t*           GetMessage(EGEvent *pEvent);
-  uint32_t                GetID(EG_Message_t *pMessage);
-  const void*             GetPayload(EG_Message_t *pMessage);
-  void*                   GetExtData(EG_Message_t *pMessage);
-  void                    Notify(EG_Message_t *pMessage);
+                EGMessage(void);
+  uint32_t      GetID(void){ return m_ID; };
+  const void*   GetPayload(void){ return m_pPayload; };
+  void*         GetExtData(void){ return m_pExtData; };
+
+  uint32_t       m_ID;            // Identifier of the message
+  void          *m_pExtData;      // Set the the user_data set in `lv_msg_subscribe`
+  void          *m_pPrivateData;  // Used internally
+  const void    *m_pPayload;      // Pointer to the data of the message
+};
+
+///////////////////////////////////////////////////////////////////////////////
+
+class EGMessageExec
+{
+public:
+                          EGMessageExec(void){};
+                          ~EGMessageExec(void);
 
   static void             Initialise(void);
+  static SubscribeDiscriptor_t*  Subsribe(uint32_t MessageID, EG_MessageSubscribeCB_t SubscribeCB, void *pExtData);
+  static SubscribeDiscriptor_t*  SubsribeObj(uint32_t MessageID, EGObject *pObj, void *pExtData);
   static void             Unsubscribe(void *pSubscribe);
   static uint32_t         UnsubscribeObj(uint32_t MessageID, EGObject *pObj);
-  static void             NotifyObjCB(void *pSubscribe, EG_Message_t *pMessage);
-  static void             DeleteObjEventCB(EGEvent *pEvent);
+  static void             Notify(uint32_t MessageID, const void *pPayload);
+  static EGMessage*       GetMessage(EGEvent *pEvent);
 
 private:
-  EG_Message_t            *m_pMessage;
+  static void             Distribute(EGMessage *pMessage);
+  static void             NotifyObjCB(void *pSubscribe, EGMessage *pMessage);
+  static void             DeleteObjEventCB(EGEvent *pEvent);
+
   static EGList           m_MessageList;
 };
 
