@@ -139,7 +139,7 @@ uint32_t shades;
 		const EGRect FillRect(pPos->m_X, pPos->m_Y, pPos->m_X + pGlyph->BoxWidth - 1, pPos->m_Y + pGlyph->BoxHeight - 1);
 		EGDrawImage DrawImage;
 		DrawImage.m_Angle = 0;
-		DrawImage.m_Zoom = EG_SCALE_NONE;
+		DrawImage.m_Scale = EGScale(EG_SCALE_NONE);
 		DrawImage.m_OPA = pDrawLabel->m_OPA;
 		DrawImage.m_BlendMode = pDrawLabel->m_BlendMode;
 		DrawImage.Draw(pDrawLabel->m_pContext, &FillRect, pMap);

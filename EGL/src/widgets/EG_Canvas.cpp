@@ -168,7 +168,7 @@ int32_t Y;
   EGImageBuffer *pDest = &m_ImageBuffer;
 	EGDrawImage LineBuffer;
 	LineBuffer.m_Angle = Angle;
-	LineBuffer.m_Zoom = Zoom;
+	LineBuffer.m_Scale = EGScale(Zoom);
 	LineBuffer.m_Pivot.m_X = PivotX;
 	LineBuffer.m_Pivot.m_Y = PivotY;
 	LineBuffer.m_Antialias = Antialias;

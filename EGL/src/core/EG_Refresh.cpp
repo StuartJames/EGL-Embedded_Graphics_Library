@@ -613,7 +613,7 @@ void RefreshObject(EGDrawContext *pContext, EGObject *pObj)
 		DrawImage.m_Angle = pObj->GetStyleTransformAngle(0);
 		if(DrawImage.m_Angle > 3600) DrawImage.m_Angle -= 3600;
 		else if(DrawImage.m_Angle < 0) DrawImage.m_Angle += 3600;
-		DrawImage.m_Zoom = pObj->GetStyleTransformZoom(0);
+    DrawImage.m_Scale = EGScale(pObj->GetStyleTransformZoom(0));
 		DrawImage.m_BlendMode = pObj->GetStyleBlendMode(0);
 		DrawImage.m_Antialias = s_pRefreshDisplay->m_pDriver->m_Antialiasing;
 		if(Flags & EG_DRAW_LAYER_FLAG_CAN_SUBDIVIDE) {

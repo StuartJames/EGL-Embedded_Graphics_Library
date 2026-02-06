@@ -48,7 +48,7 @@ public:
 
   const EGDrawContext *m_pContext;
   int16_t             m_Angle;
-  uint16_t            m_Zoom;
+  EGScale             m_Scale;
   EGPoint             m_Pivot;
   EG_Color_t          m_Recolor;
   EG_OPA_t            m_RecolorOPA;

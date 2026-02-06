@@ -324,8 +324,7 @@ uint32_t EGImageBuffer::CalculateBufferSize(EG_Coord_t Width, EG_Coord_t Height,
 
 //////////////////////////////////////////////////////////////////////////////////////
 
-void EGImageBuffer::GetTransformedRect(EGRect *pRect, EG_Coord_t Width, EG_Coord_t Height, int16_t Angle, uint16_t Zoom,
-                                        const EGPoint *pPivot)
+void EGImageBuffer::GetTransformedRect(EGRect *pRect, EG_Coord_t Width, EG_Coord_t Height, int16_t Angle, EGScale Scale, const EGPoint *pPivot)
 {
 #if EG_DRAW_COMPLEX
 EGPoint Point1(0,0);
@@ -333,24 +332,25 @@ EGPoint Point2(Width,0);
 EGPoint Point3(0,Height);
 EGPoint Point4(Width,Height);
 
-  if(Angle == 0 && Zoom == EG_SCALE_NONE) {
+  if(Angle == 0 && !Scale.IsScaled()) {
 		pRect->SetX1(0);
 		pRect->SetY1(0);
 		pRect->SetX2(Width - 1);
 		pRect->SetY2(Height - 1);
 		return;
 	}
-	Point1.PointTransform(Angle, Zoom, pPivot);
-	Point2.PointTransform(Angle, Zoom, pPivot);
-	Point3.PointTransform(Angle, Zoom, pPivot);
-	Point4.PointTransform(Angle, Zoom, pPivot);
+	Point1.PointTransform(Angle, Scale, pPivot);
+	Point2.PointTransform(Angle, Scale, pPivot);
+	Point3.PointTransform(Angle, Scale, pPivot);
+	Point4.PointTransform(Angle, Scale, pPivot);
 	pRect->SetX1(EG_MIN4(Point1.m_X, Point2.m_X, Point3.m_X, Point4.m_X) - 2);
 	pRect->SetX2(EG_MAX4(Point1.m_X, Point2.m_X, Point3.m_X, Point4.m_X) + 2);
 	pRect->SetY1(EG_MIN4(Point1.m_Y, Point2.m_Y, Point3.m_Y, Point4.m_Y) - 2);
 	pRect->SetY2(EG_MAX4(Point1.m_Y, Point2.m_Y, Point3.m_Y, Point4.m_Y) + 2);
 #else
 	EG_UNUSED(Angle);
-	EG_UNUSED(Zoom);
+	EG_UNUSED(ScaleX);
+	EG_UNUSED(ScaleY);
 	EG_UNUSED(pPivot);
 	pRect->SetX1(0);
 	pRect->SetY1(0);

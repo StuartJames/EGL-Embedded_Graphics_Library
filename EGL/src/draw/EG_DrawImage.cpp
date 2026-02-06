@@ -35,7 +35,7 @@
 EGDrawImage::EGDrawImage(void) : 
   m_pContext(nullptr),
   m_Angle(0),
-  m_Zoom(EG_SCALE_NONE),
+  m_Scale(EG_SCALE_NONE),
   m_Pivot(0, 0),
   m_Recolor(EG_ColorBlack()),
   m_OPA(EG_OPA_COVER),
@@ -202,7 +202,7 @@ EG_Result_t EG_ATTRIBUTE_FAST_MEM EGDrawImage::PreDraw(const EGRect *pRect, cons
 	else if(HasAlpha((EG_ImageColorFormat_t)pCachedDescriptor->DecoderDSC.Header.ColorFormat))	ColorFormat = EG_COLOR_FORMAT_NATIVE_ALPHA;
 	else ColorFormat = EG_COLOR_FORMAT_NATIVE;
 	if(ColorFormat == EG_COLOR_FORMAT_ALPHA_8BIT) {
-		if(m_Angle || m_Zoom != EG_SCALE_NONE) {
+		if(m_Angle || m_Scale.IsScaled()) {
 			ColorFormat = EG_COLOR_FORMAT_NATIVE_ALPHA;			//  resume normal method
 			pCachedDescriptor->DecoderDSC.pImageData = nullptr;
 		}
@@ -213,10 +213,10 @@ EG_Result_t EG_ATTRIBUTE_FAST_MEM EGDrawImage::PreDraw(const EGRect *pRect, cons
 	}
 	else if(pCachedDescriptor->DecoderDSC.pImageData) {	// The decoder gave the entire uncompressed image.
 		EGRect MapRectRotate(pRect);
-		if(m_Angle || m_Zoom != EG_SCALE_NONE) {
+		if(m_Angle || m_Scale.IsScaled()) {
 			int32_t Width = pRect->GetWidth();
 			int32_t Height = pRect->GetHeight();
-			EGImageBuffer::GetTransformedRect(&MapRectRotate, Width, Height, m_Angle, m_Zoom, &m_Pivot);
+			EGImageBuffer::GetTransformedRect(&MapRectRotate, Width, Height, m_Angle, m_Scale, &m_Pivot);
 			MapRectRotate.Move(pRect->GetX1(), pRect->GetY1());
 		}
 		EGRect CommonClip;          // Common area of mask and area

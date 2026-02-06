@@ -44,18 +44,20 @@ void EGInputDevice::ScrollHandler(EG_ProcessedInput_t *pProcess)
 		if(pProcess->ResetQuery) return;
 	}
 	int16_t Angle = 0;	// Set new position or scroll if the vector is not zero
-	int16_t Zoom = 256;
+  int16_t Scale = 256;
 	EGObject *pParent = pScrollObj;
 	while(pParent) {
 		Angle += pParent->GetStyleTransformAngle(0);
-		Zoom *= (pParent->GetStyleTransformZoom(0) / 256);
+		int32_t Zoom = pParent->GetStyleTransformZoom(0);
+    Scale = (Scale * Zoom) >> 8;
 		pParent = pParent->GetParent();
 	}
-	if(Angle != 0 || Zoom != EG_SCALE_NONE) {
+  if(Scale == 0) Scale = 1;
+	if(Angle != 0 || Scale != EG_SCALE_NONE) {
 		Angle = -Angle;
-		Zoom = (256 * 256) / Zoom;
+		Scale = (256 * 256) / Scale;
 		EGPoint Pivot = {0, 0};
-		pProcess->Pointer.Vector.PointTransform(Angle, Zoom, &Pivot);
+		pProcess->Pointer.Vector.PointTransform(Angle, EGScale(Scale), &Pivot);
 	}
 	EG_Coord_t DifferenceX = 0;
 	EG_Coord_t DifferenceY = 0;
@@ -221,20 +223,21 @@ bool HorizontalEnable = false, VerticalEnable = false;
 	while(pActiveObj) {
 		// Get the transformed ScrollSum with this object
 		int16_t Angle = 0;
-		int32_t Zoom = 256;
+    int16_t Scale = 256;
 		EGPoint Pivot = {0, 0};
 		EGObject *pParent = pActiveObj;
 		while(pParent) {
 			Angle += pParent->GetStyleTransformAngle(0);
-			int32_t zoom_act = pParent->GetStyleTransformZoom(0);
-			Zoom = (Zoom * zoom_act) >> 8;
+  		int32_t Zoom = pParent->GetStyleTransformZoom(0);
+      Scale = (Scale * Zoom) >> 8;
 			pParent = pParent->GetParent();
 		}
 		EGPoint ScrollSum = pProcess->Pointer.ScrollSum;
-		if(Angle != 0 || Zoom != EG_SCALE_NONE) {
+    if(Scale == 0) Scale = 1;
+  	if(Angle != 0 || Scale != EG_SCALE_NONE) {
 			Angle = -Angle;
-			Zoom = (256 * 256) / Zoom;
-			ScrollSum.PointTransform(Angle, Zoom, &Pivot);
+  		Scale = (256 * 256) / Scale;
+			ScrollSum.PointTransform(Angle, EGScale(Scale), &Pivot);
 		}
 		if(EG_ABS(ScrollSum.m_X) > EG_ABS(ScrollSum.m_Y)) HorizontalEnable = true; // Decide if it's a horizontal or vertical scroll
 		else VerticalEnable = true;

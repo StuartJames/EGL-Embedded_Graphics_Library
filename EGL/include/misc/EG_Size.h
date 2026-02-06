@@ -30,31 +30,42 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-class EGScale;
+#define EG_SCALE_NONE                       256        // Value for not zooming the image
+EG_EXPORT_CONST_INT(EG_SCALE_NONE);
 
 ////////////////////////////////////////////////////////////////////////////////
 
-class EGPoint
+class EGSize
 {
 public:
-                      EGPoint();
-	                    EGPoint(const EGPoint &InPoint);
-	                    EGPoint(const EGPoint *pInPoint);
-	                    EGPoint(EG_Coord_t X, EG_Coord_t Y);
+                      EGSize();
+	                    EGSize(const EGSize &InSize);
+	                    EGSize(const EGSize *pInSize);
+	                    EGSize(EG_Coord_t X, EG_Coord_t Y);
 	void                Set(EG_Coord_t X, EG_Coord_t Y);
-  void                operator = (const EGPoint &rval);
-	void                operator += (const EGPoint rval);
-	void                operator -= (const EGPoint rval);
+  void                operator = (const EGSize &rval);
+	void                operator += (const EGSize rval);
+	void                operator -= (const EGSize rval);
+	void                operator *= (const EGSize rval);
 	void                operator++ (void);
 	void                operator-- (void);
-  void                Offset(EG_Coord_t X, EG_Coord_t Y);
-  void                Offset(const EGPoint *pPoint);
-  void                PointTransform(int32_t Angle, EGScale Scale, const EGPoint *pPivot, bool ZoomFirst =false);
+	bool                operator == (const EGSize &rval) const;
 
 	EG_Coord_t          m_X;
 	EG_Coord_t          m_Y;
-	static int32_t      m_SIN;
-	static int32_t      m_COS;
-  static int32_t      m_PreviousAngle;
-
 };
+
+///////////////////////////////////////////////////////////////////////////////////////
+
+class EGScale : public EGSize
+{
+public:
+                      EGScale(void);
+	                    EGScale(EG_Coord_t X, EG_Coord_t Y) : EGSize(X, Y){};
+	                    EGScale(EG_Coord_t XY) : EGSize(XY, XY){};
+  bool                IsScaled(void) const;
+  void                Normalise(void);
+  void                Negate(void);
+  EG_Coord_t          Minimum(void);
+};
+

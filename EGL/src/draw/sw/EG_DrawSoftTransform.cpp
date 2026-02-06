@@ -31,17 +31,18 @@
 #if EG_DRAW_COMPLEX
 
 typedef struct {
-	int32_t x_in;
-	int32_t y_in;
-	int32_t x_out;
-	int32_t y_out;
-	int32_t sinma;
-	int32_t cosma;
-	int32_t zoom;
-	int32_t angle;
-	int32_t pivot_x_256;
-	int32_t pivot_y_256;
-	EGPoint pivot;
+	int32_t InX;
+	int32_t InY;
+	int32_t OutX;
+	int32_t OutY;
+	int32_t SinMa;
+	int32_t CosMa;
+	int32_t ScaleX;
+	int32_t ScaleY;
+	int32_t Angle;
+	int32_t Pivot256X;
+	int32_t Pivot256Y;
+	EGPoint Pivot;
 } PointTransform_t;
 
 static void TransformPointUpscaled(PointTransform_t *t, int32_t xin, int32_t yin, int32_t *xout, int32_t *yout);
@@ -64,13 +65,14 @@ void EGSoftContext::DrawTransform(const EGRect *pRect, const void *pSourceBuffer
      EG_Coord_t SourceHeight, EG_Coord_t SourceStride, const EGDrawImage *pImage, EG_ImageColorFormat_t ColorFormat, EG_Color_t *pColorBuffer, EG_OPA_t *pBufferOPA)
 {
 	PointTransform_t tr_dsc;
-	tr_dsc.angle = -pImage->m_Angle;
-	tr_dsc.zoom = (256 * 256) / pImage->m_Zoom;
-	tr_dsc.pivot = pImage->m_Pivot;
+	tr_dsc.Angle = -pImage->m_Angle;
+	tr_dsc.ScaleX = (256 * 256) / pImage->m_Scale.m_X;
+	tr_dsc.ScaleY = (256 * 256) / pImage->m_Scale.m_Y;
+	tr_dsc.Pivot = pImage->m_Pivot;
 
-	int32_t angle_low = tr_dsc.angle / 10;
+	int32_t angle_low = tr_dsc.Angle / 10;
 	int32_t angle_high = angle_low + 1;
-	int32_t angle_rem = tr_dsc.angle - (angle_low * 10);
+	int32_t angle_rem = tr_dsc.Angle - (angle_low * 10);
 
 	int32_t s1 = EG_TrigoSin(angle_low);
 	int32_t s2 = EG_TrigoSin(angle_high);
@@ -78,12 +80,12 @@ void EGSoftContext::DrawTransform(const EGRect *pRect, const void *pSourceBuffer
 	int32_t c1 = EG_TrigoSin(angle_low + 90);
 	int32_t c2 = EG_TrigoSin(angle_high + 90);
 
-	tr_dsc.sinma = (s1 * (10 - angle_rem) + s2 * angle_rem) / 10;
-	tr_dsc.cosma = (c1 * (10 - angle_rem) + c2 * angle_rem) / 10;
-	tr_dsc.sinma = tr_dsc.sinma >> (EG_TRIGO_SHIFT - 10);
-	tr_dsc.cosma = tr_dsc.cosma >> (EG_TRIGO_SHIFT - 10);
-	tr_dsc.pivot_x_256 = tr_dsc.pivot.m_X * 256;
-	tr_dsc.pivot_y_256 = tr_dsc.pivot.m_Y * 256;
+	tr_dsc.SinMa = (s1 * (10 - angle_rem) + s2 * angle_rem) / 10;
+	tr_dsc.CosMa = (c1 * (10 - angle_rem) + c2 * angle_rem) / 10;
+	tr_dsc.SinMa = tr_dsc.SinMa >> (EG_TRIGO_SHIFT - 10);
+	tr_dsc.CosMa = tr_dsc.CosMa >> (EG_TRIGO_SHIFT - 10);
+	tr_dsc.Pivot256X = tr_dsc.Pivot.m_X * 256;
+	tr_dsc.Pivot256Y = tr_dsc.Pivot.m_Y * 256;
 
 	EG_Coord_t DestWidth = pRect->GetWidth();
 	EG_Coord_t DestHeight = pRect->GetHeight();
@@ -432,26 +434,26 @@ static void AlphaRGB_AntiAlias(const uint8_t *src, EG_Coord_t SourceWidth, EG_Co
 static void TransformPointUpscaled(PointTransform_t *t, int32_t xin, int32_t yin, int32_t *xout,
 																		 int32_t *yout)
 {
-	if(t->angle == 0 && t->zoom == EG_SCALE_NONE) {
+	if(t->Angle == 0 && t->ScaleX == EG_SCALE_NONE && t->ScaleY == EG_SCALE_NONE) {
 		*xout = xin * 256;
 		*yout = yin * 256;
 		return;
 	}
 
-	xin -= t->pivot.m_X;
-	yin -= t->pivot.m_Y;
+	xin -= t->Pivot.m_X;
+	yin -= t->Pivot.m_Y;
 
-	if(t->angle == 0) {
-		*xout = ((int32_t)(xin * t->zoom)) + (t->pivot_x_256);
-		*yout = ((int32_t)(yin * t->zoom)) + (t->pivot_y_256);
+	if(t->Angle == 0) {
+		*xout = ((int32_t)(xin * t->ScaleX)) + (t->Pivot256X);
+		*yout = ((int32_t)(yin * t->ScaleY)) + (t->Pivot256Y);
 	}
-	else if(t->zoom == EG_SCALE_NONE) {
-		*xout = ((t->cosma * xin - t->sinma * yin) >> 2) + (t->pivot_x_256);
-		*yout = ((t->sinma * xin + t->cosma * yin) >> 2) + (t->pivot_y_256);
+	else if(t->ScaleX == EG_SCALE_NONE && t->ScaleY == EG_SCALE_NONE) {
+		*xout = ((t->CosMa * xin - t->SinMa * yin) >> 2) + (t->Pivot256X);
+		*yout = ((t->SinMa * xin + t->CosMa * yin) >> 2) + (t->Pivot256Y);
 	}
 	else {
-		*xout = (((t->cosma * xin - t->sinma * yin) * t->zoom) >> 10) + (t->pivot_x_256);
-		*yout = (((t->sinma * xin + t->cosma * yin) * t->zoom) >> 10) + (t->pivot_y_256);
+		*xout = (((t->CosMa * xin - t->SinMa * yin) * t->ScaleX) >> 10) + (t->Pivot256X);
+		*yout = (((t->SinMa * xin + t->CosMa * yin) * t->ScaleY) >> 10) + (t->Pivot256Y);
 	}
 }
 

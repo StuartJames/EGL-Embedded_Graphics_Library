@@ -886,25 +886,26 @@ void EGInputDevice::ReleaseProcess(EG_ProcessedInput_t *pProcess)
 		// Get the transformed vector with this object
 		if(pScrollObject) {
 			int16_t Angle = 0;
-			int16_t Zoom = 256;
-			EGPoint Pivot = {0, 0};
+			EGScale Scale;
+			EGPoint Pivot;
 			EGObject *pParent = pScrollObject;
 			while(pParent) {
 				Angle += pParent->GetStyleTransformAngle(0);
-				Zoom *= (pParent->GetStyleTransformZoom(0) / 256);
+				int32_t Zoom = pParent->GetStyleTransformZoom(0);
+        Scale.m_X = (Scale.m_X * Zoom) >> 8;
+        Scale.m_Y = (Scale.m_Y * Zoom) >> 8;
 				pParent = pParent->GetParent();
 			}
-
-			if(Angle != 0 || Zoom != EG_SCALE_NONE) {
+      Scale.Normalise();
+			if(Angle != 0 || Scale.IsScaled()) {
 				Angle = -Angle;
-				Zoom = (256 * 256) / Zoom;
-				pProcess->Pointer.ScrollThrowVector.PointTransform(Angle, Zoom, &Pivot);
-				pProcess->Pointer.LastScrollThrowVector.PointTransform(Angle, Zoom, &Pivot);
+				Scale.Negate();
+				pProcess->Pointer.ScrollThrowVector.PointTransform(Angle, Scale, &Pivot);
+				pProcess->Pointer.LastScrollThrowVector.PointTransform(Angle, Scale, &Pivot);
 			}
 		}
 	}
-
-	// The reset can be set in the Call the ancestor's event handler function. 
+	// The reset can be set in the Call to the ancestor's event handler. 
 	if(pScrollObject) {
 		ScrollThrowHandler(pProcess);
 		if(ResetCheck(pProcess)) return;

@@ -96,8 +96,7 @@ public:
   void            SetPalette(uint8_t ID, EG_Color_t Color);
   uint32_t        CalculateBufferSize(EG_Coord_t Width, EG_Coord_t Height, EG_ImageColorFormat_t ColorFormat);
 
-  static void     GetTransformedRect(EGRect * res, EG_Coord_t Width, EG_Coord_t Height, int16_t Angle, uint16_t Zoom,
-                                        const EGPoint *pPivot);
+  static void     GetTransformedRect(EGRect *pRect, EG_Coord_t Width, EG_Coord_t Height, int16_t Angle, EGScale Scale, const EGPoint *pPivot);
 
   EG_ImageHeader_t  m_Header; // A header describing the basics of the image
   uint32_t          m_DataSize;     // Size of the image in bytes
