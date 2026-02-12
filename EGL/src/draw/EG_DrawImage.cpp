@@ -42,14 +42,14 @@ EGDrawImage::EGDrawImage(void) :
   m_BlendMode(EG_BLEND_MODE_NORMAL),
   m_FrameID(0)
 {
-	m_Antialias = EG_COLOR_DEPTH > 8 ? 1 : 0;
+	m_AntiAlias = EG_COLOR_DEPTH > 8 ? 1 : 0;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
 
 void EGDrawImage::Draw(const EGDrawContext *pDrawContext, const EGRect *pRect, const void *pSource)
 {
-	EG_Result_t res = EG_RES_INVALID;
+EG_Result_t res = EG_RES_INVALID;
 
 	if(pSource == nullptr) {
 		EG_LOG_WARN("Image draw: Source is NULL");

@@ -316,10 +316,10 @@ EG_GradCacheItem_t* EG_GetGradient(const EG_GradDescriptor_t *pGradient, EG_Coor
 
 EG_GradientColor_t EG_ATTRIBUTE_FAST_MEM EG_GradientCalculate(const EG_GradDescriptor_t *dsc, EG_Coord_t range, EG_Coord_t frac)
 {
-	EG_GradientColor_t tmp;
-	EG_Color32_t one, two;
-	// Clip out-of-bounds first
-	int32_t min = (dsc->stops[0].frac * range) >> 8;
+EG_GradientColor_t tmp;
+EG_Color32_t one, two;
+
+	int32_t min = (dsc->stops[0].frac * range) >> 8;	// Clip out-of-bounds first
 	if(frac <= min) {
 		GRAD_CONV(tmp, dsc->stops[0].color);
 		return tmp;
@@ -329,8 +329,7 @@ EG_GradientColor_t EG_ATTRIBUTE_FAST_MEM EG_GradientCalculate(const EG_GradDescr
 		GRAD_CONV(tmp, dsc->stops[dsc->stops_count - 1].color);
 		return tmp;
 	}
-	// Find the 2 closest stop now
-	int32_t d = 0;
+	int32_t d = 0;	// Find the 2 closest stop now
 	for(uint8_t i = 1; i < dsc->stops_count; i++) {
 		int32_t cur = (dsc->stops[i].frac * range) >> 8;
 		if(frac <= cur) {
@@ -343,8 +342,7 @@ EG_GradientColor_t EG_ATTRIBUTE_FAST_MEM EG_GradientCalculate(const EG_GradDescr
 		}
 	}
 	EG_ASSERT(d != 0);
-	// Then interpolate
-	frac -= min;
+	frac -= min;	// Then interpolate
 	EG_OPA_t mix = (frac * 255) / d;
 	EG_OPA_t imix = 255 - mix;
 	EG_GradientColor_t r = GRAD_CM(EG_UDIV255(two.ch.red * mix + one.ch.red * imix), EG_UDIV255(two.ch.green * mix + one.ch.green * imix),

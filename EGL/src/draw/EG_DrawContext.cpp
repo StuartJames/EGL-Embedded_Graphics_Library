@@ -39,9 +39,9 @@ void             (*EGDrawContext::TransformProc)(const EGRect *pRect, const void
 void             (*EGDrawContext::WaitForFinishProc)(void);
 void             (*EGDrawContext::CopyBufferProc)(void *pDestBuffer, EG_Coord_t DestStride, EGRect *pDestArea,
                    void *pSourceBuffer, EG_Coord_t SourceStride, EGRect *pSourceArea);
-EGLayerContext*  (*EGDrawContext::IntialiseLayerProc)(EGLayerContext *pDrawLayer, EGDrawLayerFlags_e Flags);
+bool             (*EGDrawContext::LayerIntialiseProc)(EGLayerContext *pDrawLayer, EGDrawLayerFlags_e Flags);
 void             (*EGDrawContext::LayerAdjustProc)(EGLayerContext *pDrawLayer,	 EGDrawLayerFlags_e Flags);
-void             (*EGDrawContext::LayerBlendProc)(EGLayerContext *pDrawLayer, EGDrawImage *pImage);
+void             (*EGDrawContext::LayerBlendProc)(EGLayerContext *pDrawLayer, EGDrawImage *pDrawImage);
 void             (*EGDrawContext::LayerDestroyProc)(EGLayerContext *pDrawLayer);
 
 void            *EGDrawContext::m_pDrawBuffer = nullptr; 

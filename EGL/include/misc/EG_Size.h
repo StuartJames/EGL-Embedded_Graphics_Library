@@ -66,6 +66,7 @@ public:
   bool                IsScaled(void) const;
   void                Normalise(void);
   void                Negate(void);
+  EG_Coord_t          Maximum(void);
   EG_Coord_t          Minimum(void);
 };
 

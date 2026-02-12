@@ -80,7 +80,7 @@ public:
   static void             (*WaitForFinishProc)(void);
   static void             (*CopyBufferProc)(void *pDestBuffer, EG_Coord_t DestStride, EGRect *pDestArea,
                             void *pSourceBuffer, EG_Coord_t SourceStride, EGRect *pSourceArea);
-  static EGLayerContext*  (*IntialiseLayerProc)(EGLayerContext *pDrawLayer, EGDrawLayerFlags_e Flags);
+  static bool             (*LayerIntialiseProc)(EGLayerContext *pDrawLayer, EGDrawLayerFlags_e Flags);
   static void             (*LayerAdjustProc)(EGLayerContext *pDrawLayer,	 EGDrawLayerFlags_e Flags);
   static void             (*LayerBlendProc)(EGLayerContext *pDrawLayer, EGDrawImage *pImage);
   static void             (*LayerDestroyProc)(EGLayerContext *pDrawLayer);

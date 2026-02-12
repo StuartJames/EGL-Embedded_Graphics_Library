@@ -153,7 +153,7 @@ void EGPoint::PointTransform(int32_t Angle, EGScale Scale, const EGPoint *pPivot
 		m_COS = m_COS >> (EG_TRIGO_SHIFT - EG_TRANSFORM_TRIGO_SHIFT);
 		m_PreviousAngle = Angle;
 	}
-	EGSize Tran(m_X, m_Y);
+  EGSize Tran(m_X, m_Y);
 	if(!Scale.IsScaled()) {
 		m_X = ((m_COS * Tran.m_X - m_SIN * Tran.m_Y) >> EG_TRANSFORM_TRIGO_SHIFT) + pPivot->m_X;
 		m_Y = ((m_SIN * Tran.m_X + m_COS * Tran.m_Y) >> EG_TRANSFORM_TRIGO_SHIFT) + pPivot->m_Y;

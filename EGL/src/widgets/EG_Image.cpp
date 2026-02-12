@@ -57,12 +57,12 @@ EGImage::EGImage(void) : EGObject(),
 	m_Width(0),
 	m_Height(0),
 	m_Rotation(0),
+	m_Scale(EG_SCALE_NONE),
 	m_SourceType(EG_IMG_SRC_UNKNOWN),
 	m_ColorFormat(EG_COLOR_FORMAT_UNKNOWN),
 	m_SizeMode(EG_IMG_SIZE_MODE_VIRTUAL)
 {
-	m_Scale.Set(EG_SCALE_NONE, EG_SCALE_NONE);
-	m_Antialias = EG_COLOR_DEPTH > 8 ? 1 : 0;
+	m_AntiAlias = EG_COLOR_DEPTH > 8 ? 1 : 0;
 // 	ESP_LOGI("[Image ]", "New: %p", (void*)pParent);
 }
 
@@ -75,12 +75,12 @@ EGImage::EGImage(EGObject *pParent, const EG_ClassType_t *pClassCnfg /*= IMAGE_C
 	m_Width(0),
 	m_Height(0),
 	m_Rotation(0),
+	m_Scale(EG_SCALE_NONE),
 	m_SourceType(EG_IMG_SRC_UNKNOWN),
 	m_ColorFormat(EG_COLOR_FORMAT_UNKNOWN),
 	m_SizeMode(EG_IMG_SIZE_MODE_VIRTUAL)
 {
-	m_Scale.Set(EG_SCALE_NONE, EG_SCALE_NONE);
-	m_Antialias = EG_COLOR_DEPTH > 8 ? 1 : 0;
+	m_AntiAlias = EG_COLOR_DEPTH > 8 ? 1 : 0;
 // 	ESP_LOGI("[Image ]", "New: %p", (void*)pParent);
   Attach(this, pParent, pClassCnfg);
 	Initialise();
@@ -108,8 +108,8 @@ void EGImage::Configure(void)
 	m_Width = GetWidth();
 	m_Height = GetHeight();
 	m_Rotation = 0;
-	m_Scale.Set(EG_SCALE_NONE, EG_SCALE_NONE);
-	m_Antialias = EG_COLOR_DEPTH > 8 ? 1 : 0;
+	m_Scale = EGScale(EG_SCALE_NONE);
+	m_AntiAlias = EG_COLOR_DEPTH > 8 ? 1 : 0;
 	m_Offset.Set(0, 0);
 	m_Pivot.Set(0, 0);
 	m_SizeMode = EG_IMG_SIZE_MODE_VIRTUAL;
@@ -272,7 +272,29 @@ void EGImage::SetPivot(EGPoint Pivot)
 
 void EGImage::SetZoom(uint16_t Zoom)
 {
-  SetScale(EGScale(Zoom));
+	if((Zoom == m_Scale.m_X) && (Zoom == m_Scale.m_Y)) return;
+	if(Zoom == 0) Zoom = 1;
+	UpdateLayout(); // Be sure the object'pSize size is calculated
+	EG_Coord_t Width = GetWidth();
+	EG_Coord_t Height = GetHeight();
+	EGRect Rect;
+	EGImageBuffer::GetTransformedRect(&Rect, Width, Height, m_Rotation, m_Scale, &m_Pivot);
+	Rect.IncX1(m_Rect.GetX1() - 1);
+	Rect.IncY1(m_Rect.GetY1() - 1);
+	Rect.IncX2(m_Rect.GetX1() + 1);
+	Rect.IncY2(m_Rect.GetY1() + 1);
+	InvalidateArea(&Rect);
+	m_Scale.Set(Zoom, Zoom);
+	EGDisplay *pDisplay = GetDisplay();
+	EGDisplay::EnableInvalidation(pDisplay, false);
+	RefreshExtDrawSize();
+	EGDisplay::EnableInvalidation(pDisplay, true);
+	EGImageBuffer::GetTransformedRect(&Rect, Width, Height, m_Rotation, m_Scale, &m_Pivot);
+	Rect.IncX1(m_Rect.GetX1() - 1);
+	Rect.IncY1(m_Rect.GetY1() - 1);
+	Rect.IncX2(m_Rect.GetX1() + 1);
+	Rect.IncY2(m_Rect.GetY1() + 1);
+	InvalidateArea(&Rect);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -309,8 +331,8 @@ void EGImage::SetScaleY(uint32_t ScaleY)
 
 void EGImage::SetAntialias(bool Antialias)
 {
-	if(Antialias == m_Antialias) return;
-	m_Antialias = Antialias;
+	if(Antialias == m_AntiAlias) return;
+	m_AntiAlias = Antialias;
 	Invalidate();
 }
 
@@ -512,7 +534,7 @@ void EGImage::Draw(EGEvent *pEvent)
 				DrawImage.m_Angle = m_Rotation;
 				DrawImage.m_Pivot.m_X = m_Pivot.m_X;
 				DrawImage.m_Pivot.m_Y = m_Pivot.m_Y;
-				DrawImage.m_Antialias = m_Antialias;
+				DrawImage.m_AntiAlias = m_AntiAlias;
 				EGRect ClipRect(BackgroundRect.GetX1() + PadLeft, BackgroundRect.GetY1() + PadTop, BackgroundRect.GetX2() - PadRight, BackgroundRect.GetY2() - PadBottom);
 				const EGRect *pOriginalClip = pContext->m_pClipRect;
 				if(!ClipRect.Intersect(&ClipRect, pContext->m_pClipRect)) return;
@@ -580,10 +602,8 @@ void EGImage::UpdateAlign(void)
       SetPivot(0, 0);
       if(m_Width != 0 && m_Height != 0) {
         UpdateLayout();
-        int32_t ScaleX = GetWidth() * EG_SCALE_NONE / m_Width;
-        int32_t ScaleY = GetHeight() * EG_SCALE_NONE / m_Height;
-        int32_t Scale = EG_MIN(ScaleX, ScaleY);   // REMOVE THIS
-        ScaleUpdate(EGScale(Scale));
+        EGScale Scale(GetWidth() * EG_SCALE_NONE / m_Width, GetHeight() * EG_SCALE_NONE / m_Height);
+        ScaleUpdate(Scale);
       }
       break;
     }
@@ -592,10 +612,8 @@ void EGImage::UpdateAlign(void)
       SetPivot(0, 0);
       if(m_Width != 0 && m_Height != 0) {
         UpdateLayout();
-        int32_t ScaleX = GetWidth() * EG_SCALE_NONE / m_Width;
-        int32_t ScaleY = GetHeight() * EG_SCALE_NONE / m_Height;
-        int32_t Scale = EG_MIN(ScaleX, ScaleY);
-        ScaleUpdate(EGScale(Scale));
+        EGScale Scale(GetWidth() * EG_SCALE_NONE / m_Width, GetHeight() * EG_SCALE_NONE / m_Height);
+        ScaleUpdate(Scale.Minimum());
       }
       break;
     }
@@ -604,10 +622,8 @@ void EGImage::UpdateAlign(void)
       SetPivot(0, 0);
       if(m_Width != 0 && m_Height != 0) {
         UpdateLayout();
-        int32_t ScaleX = GetWidth() * EG_SCALE_NONE / m_Width;
-        int32_t ScaleY = GetHeight() * EG_SCALE_NONE / m_Height;
-        int32_t Scale = EG_MAX(ScaleX, ScaleY);
-        ScaleUpdate(EGScale(Scale));
+        EGScale Scale(GetWidth() * EG_SCALE_NONE / m_Width, GetHeight() * EG_SCALE_NONE / m_Height);
+        ScaleUpdate(Scale.Maximum());
       }
       break;
     }

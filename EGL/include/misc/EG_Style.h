@@ -27,7 +27,6 @@
 #include <stdint.h>
 #include "../font/EG_Font.h"
 #include "EG_Color.h"
-#include "EG_Size.h"
 #include "EG_Rect.h"
 #include "EG_Animate.h"
 #include "EG_Text.h"
@@ -48,6 +47,9 @@
 #define EG_STYLE_PROP_PARENT_LAYOUT_REFRESH (1 << 3)  // Requires layout update on parent when changed
 #define EG_STYLE_PROP_LAYER_REFR            (1 << 4)  // Affects layer handling
 #define EG_STYLE_PROP_ALL                   (0x1F)     // Indicating all flags
+
+#define EG_SCALE_NONE                    256        // Value for not zooming the image
+EG_EXPORT_CONST_INT(EG_SCALE_NONE);
 
 #define EG_STYLE_PROP_META_INHERIT 0x8000
 #define EG_STYLE_PROP_META_INITIAL 0x4000

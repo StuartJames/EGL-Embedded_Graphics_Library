@@ -105,7 +105,7 @@ void EGSoftContext::DrawTransform(const EGRect *pRect, const void *pSourceBuffer
 		int32_t xs_ups = xs1_ups + 0x80;
 		int32_t ys_ups = ys1_ups + 0x80;
 
-		if(pImage->m_Antialias == 0) {
+		if(pImage->m_AntiAlias == 0) {
 			switch(ColorFormat) {
 				case EG_COLOR_FORMAT_NATIVE_ALPHA:
 					AlphaRGB_NoAntiAlias((uint8_t*)pSourceBuffer, SourceWidth, SourceHeight, SourceStride, xs_ups, ys_ups, xs_step_256, ys_step_256, DestWidth, pColorBuffer, pBufferOPA);

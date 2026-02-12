@@ -45,7 +45,7 @@ void EG_ATTRIBUTE_FAST_MEM EGSoftContext::DrawImageDecoded(const EGDrawImage *pD
   const EGRect *pClipRect = pContext->m_pClipRect;	// Use the clip area as draw area
 	EGRect DrawRect(pClipRect);
 	bool MaskAny = HasAnyDrawMask(&DrawRect);
-	bool DoTransform = ((pDrawImage->m_Angle != 0) || pDrawImage->m_Scale.IsScaled()) ? true : false;
+	bool DoTransform = ((pDrawImage->m_Angle != 0) || (pDrawImage->m_Scale.IsScaled())) ? true : false;
 	EGRect BlendRect;
 	EGSoftBlend BlendObj(pContext);
 	BlendObj.m_OPA = pDrawImage->m_OPA;
@@ -102,7 +102,8 @@ void EG_ATTRIBUTE_FAST_MEM EGSoftContext::DrawImageDecoded(const EGDrawImage *pD
 		BlendObj.m_pSourceBuffer = pBufferRGB;
 		EG_Coord_t LastY = BlendRect.GetY2();
 		BlendRect.SetY2(BlendRect.GetY1() + BufferHeight - 1);
-		DrawMaskRes_t DefMaskResult = (pDrawImage->m_Angle || (ColorFormat != EG_COLOR_FORMAT_NATIVE) || pDrawImage->m_Scale.IsScaled()) ? EG_DRAW_MASK_RES_CHANGED : EG_DRAW_MASK_RES_FULL_COVER;
+		DrawMaskRes_t DefMaskResult = (pDrawImage->m_Angle || (ColorFormat != EG_COLOR_FORMAT_NATIVE) || (pDrawImage->m_Scale.IsScaled())) ?
+			                              EG_DRAW_MASK_RES_CHANGED : EG_DRAW_MASK_RES_FULL_COVER;
 		BlendObj.m_MaskResult = DefMaskResult;
 		while(BlendRect.GetY1() <= LastY) {
 			// Apply transformations if any or separate the channels

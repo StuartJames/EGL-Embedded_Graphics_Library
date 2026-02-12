@@ -52,13 +52,12 @@ EGLayerContext::~EGLayerContext()
 	EGDisplay *pDisplay = GetRefreshingDisplay();
 	pDisplay->m_pDriver->m_ScreenTransparent = m_Original.ScreenTransparent;
 	if(m_pContext->LayerDestroyProc) m_pContext->LayerDestroyProc(this);
-//	EG_FreeMem(layer_ctx);
 }
 //////////////////////////////////////////////////////////////////////////////////////
 
-EGLayerContext* EGLayerContext::Create(EGDrawContext *pContext, const EGRect *pLayerArea, EGDrawLayerFlags_e Flags)
+EGLayerContext* EGLayerContext::Create(EGDrawContext *pContext, const EGRect *pLayerRect, EGDrawLayerFlags_e Flags)
 {
-	if(pContext->IntialiseLayerProc == nullptr) return nullptr;
+	if(pContext->LayerIntialiseProc == nullptr) return nullptr;
   EGLayerContext *pDrawLayer = new EGLayerContext;
 	EGDisplay *pDisplay = GetRefreshingDisplay();
   pDrawLayer->m_pContext = pContext;
@@ -66,9 +65,8 @@ EGLayerContext* EGLayerContext::Create(EGDrawContext *pContext, const EGRect *pL
 	pDrawLayer->m_Original.pBuferArea = pContext->m_pDrawRect;
 	pDrawLayer->m_Original.pClipRect = pContext->m_pClipRect;
 	pDrawLayer->m_Original.ScreenTransparent = pDisplay->m_pDriver->m_ScreenTransparent;
-	pLayerArea->Copy(&pDrawLayer->m_FullRect);
-	pContext->IntialiseLayerProc(pDrawLayer, Flags);
-	if(pDrawLayer->m_pLayerBuffer == nullptr) {
+	pLayerRect->Copy(&pDrawLayer->m_FullRect);
+	if(!pContext->LayerIntialiseProc(pDrawLayer, Flags)){
 		delete pDrawLayer;
     return nullptr;
 	}
@@ -84,8 +82,8 @@ void EGLayerContext::Adjust(EGDrawLayerFlags_e Flags)
 
 //////////////////////////////////////////////////////////////////////////////////////
 
-void EGLayerContext::Blend(EGDrawImage *draw_dsc)
+void EGLayerContext::Blend(EGDrawImage *pDrawImage)
 {
-	if(m_pContext->LayerBlendProc) m_pContext->LayerBlendProc(this, draw_dsc);
+	if(m_pContext->LayerBlendProc) m_pContext->LayerBlendProc(this, pDrawImage);
 }
 

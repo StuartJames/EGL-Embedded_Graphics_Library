@@ -97,7 +97,7 @@ public:
   uint32_t            m_DirectMode : 1;         // 1: Use screen-sized buffers and draw to absolute coordinates
   uint32_t            m_FullRefresh : 1;        // 1: Always make the whole screen redrawn
   uint32_t            m_SoftRotate : 1;         // 1: use software rotation (slower)
-  uint32_t            m_Antialiasing : 1;       // 1: anti-aliasing is enabled on this display.
+  uint32_t            m_AntiAliasing : 1;       // 1: anti-aliasing is enabled on this display.
   uint32_t            m_Rotated : 2;            // 1: turn the display by 90 degree. @warning Does not update coordinates for you!
   uint32_t            m_ScreenTransparent : 1;  // Handle if the screen doesn't have a solid (opa == EG_OPA_COVER) background. Use only if required because it's slower.
   uint32_t            m_DPI : 10;               // DPI (dot per inch) of the display. Default value is `EG_DPI_DEF`.

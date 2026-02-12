@@ -171,7 +171,7 @@ int32_t Y;
 	LineBuffer.m_Scale = EGScale(Zoom);
 	LineBuffer.m_Pivot.m_X = PivotX;
 	LineBuffer.m_Pivot.m_Y = PivotY;
-	LineBuffer.m_Antialias = Antialias;
+	LineBuffer.m_AntiAlias = Antialias;
 	EGRect DestRect;
 	DestRect.SetX1(-OffsetX);
 	DestRect.SetX2(DestRect.GetX1() + pDest->m_Header.Width - 1);
@@ -448,7 +448,7 @@ void EGCanvas::DrawRect(EG_Coord_t X, EG_Coord_t Y, EG_Coord_t Width, EG_Coord_t
 	SetRefreshingDisplay(&FakeDisplay);
 	EG_Color_t ctransp = EG_COLOR_CHROMA_KEY;
 	if(m_ImageBuffer.m_Header.ColorFormat == EG_COLOR_FORMAT_NATIVE_CHROMA_KEYED && pDrawRect->m_BackgroundColor.full == ctransp.full) {
-		FakeDisplay.m_pDriver->m_Antialiasing = 0;
+		FakeDisplay.m_pDriver->m_AntiAliasing = 0;
 	}
 	EGRect Rect(X, Y, X + Width - 1, Y + Height - 1);
 	pDrawRect->Draw(DisplayDriver.m_pContext, &Rect);
@@ -521,7 +521,7 @@ void EGCanvas::DrawLine(const EGPoint Points[], uint32_t PointCount, EGDrawLine 
 	SetRefreshingDisplay(&FakeDisplay);
 	EG_Color_t ctransp = EG_COLOR_CHROMA_KEY;
 	if(m_ImageBuffer.m_Header.ColorFormat == EG_COLOR_FORMAT_NATIVE_CHROMA_KEYED && pDrawLine->m_Color.full == ctransp.full) {
-		FakeDisplay.m_pDriver->m_Antialiasing = 0;
+		FakeDisplay.m_pDriver->m_AntiAliasing = 0;
 	}
 	for(uint32_t i = 0; i < PointCount - 1; i++) {
 		pDrawLine->Draw(DisplayDriver.m_pContext, &Points[i], &Points[i + 1]);
@@ -547,7 +547,7 @@ void EGCanvas::DrawPolygon(const EGPoint Points[], uint32_t PointCount, EGDrawRe
 	SetRefreshingDisplay(&FakeDisplay);
 	EG_Color_t ctransp = EG_COLOR_CHROMA_KEY;
 	if(m_ImageBuffer.m_Header.ColorFormat == EG_COLOR_FORMAT_NATIVE_CHROMA_KEYED && pDrawRect->m_BackgroundColor.full == ctransp.full) {
-		FakeDisplay.m_pDriver->m_Antialiasing = 0;
+		FakeDisplay.m_pDriver->m_AntiAliasing = 0;
 	}
 	EGDrawPolygon DrawPolygon;
   DrawPolygon.Polygon(DisplayDriver.m_pContext, pDrawRect, Points, PointCount);

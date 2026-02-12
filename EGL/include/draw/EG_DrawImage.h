@@ -55,7 +55,7 @@ public:
   EG_OPA_t            m_OPA;
   EG_BlendMode_e      m_BlendMode : 4;
   int32_t             m_FrameID;
-  uint8_t             m_Antialias : 1;
+  uint8_t             m_AntiAlias : 1;
 
 private:
   EG_Result_t         PreDraw(const EGRect *pRect, const void *pSource);

@@ -244,7 +244,7 @@ void EGObject::InititialseDrawImage(uint32_t Part, EGDrawImage *pDrawImage)
 	if(OPA < EG_OPA_MAX) pDrawImage->m_OPA = (OPA * pDrawImage->m_OPA) >> 8;
 	if(pDrawImage->m_OPA <= EG_OPA_MIN) return;
 	pDrawImage->m_Angle = 0;
-	pDrawImage->m_Scale = EGScale(EG_SCALE_NONE);
+	pDrawImage->m_Scale.Set(EG_SCALE_NONE, EG_SCALE_NONE);
 	pDrawImage->m_Pivot.m_X = m_Rect.GetWidth() / 2;
 	pDrawImage->m_Pivot.m_Y = m_Rect.GetHeight() / 2;
 	pDrawImage->m_RecolorOPA = GetStyleImageRecolorOPA(Part);

@@ -1888,7 +1888,7 @@
         #ifdef CONFIG_EG_THEME_DEFAULT_DARK
             #define EG_THEME_DEFAULT_DARK CONFIG_EG_THEME_DEFAULT_DARK
         #else
-            #define EG_THEME_DEFAULT_DARK 0
+            #define EG_THEME_DEFAULT_DARK 1
         #endif
     #endif
 

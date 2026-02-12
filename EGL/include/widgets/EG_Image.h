@@ -108,7 +108,7 @@ public:
   EGScale             GetScale(void){ return m_Scale; };
   uint16_t            GetScaleX(void){ return m_Scale.m_X; };
   uint16_t            GetScaleY(void){ return m_Scale.m_Y; };
-  bool                GetAntialias(void){ return m_Antialias ? true : false; };
+  bool                GetAntialias(void){ return m_AntiAlias ? true : false; };
   EG_ImageSizeMode_e  GetSizeMode(void){ return (EG_ImageSizeMode_e)m_SizeMode; };
   EG_ImageAlign_e     GetInnerAlign(void){ return m_Align; };
   void                Event(EGEvent *pEvent);
@@ -124,7 +124,7 @@ public:
   EGScale             m_Scale;          // 256 means no zoom, 512 double size, 128 half size
   uint8_t             m_SourceType : 2; // See: EG_ImageSource_t
   uint8_t             m_ColorFormat : 5;// Color format from `lv_img_color_format_t`
-  uint8_t             m_Antialias : 1;  // Apply anti-aliasing in transformations (rotate, zoom)
+  uint8_t             m_AntiAlias : 1;  // Apply anti-aliasing in transformations (rotate, zoom)
   uint8_t             m_SizeMode: 2;    // Image size mode when image size and object size is different.
   EG_ImageAlign_e     m_Align;
 

@@ -47,7 +47,7 @@ public:
   void            Blend(EGDrawImage *pDrawImage);
   void            InitialiseBuffer(void){};
 
-  static EGLayerContext*  Create(EGDrawContext *pContext, const EGRect *pLayerArea, EGDrawLayerFlags_e Flags);
+  static EGLayerContext*  Create(EGDrawContext *pContext, const EGRect *pLayerRect, EGDrawLayerFlags_e Flags);
 
   EGDrawContext  *m_pContext;
   EGRect          m_FullRect;

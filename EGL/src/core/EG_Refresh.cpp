@@ -613,9 +613,10 @@ void RefreshObject(EGDrawContext *pContext, EGObject *pObj)
 		DrawImage.m_Angle = pObj->GetStyleTransformAngle(0);
 		if(DrawImage.m_Angle > 3600) DrawImage.m_Angle -= 3600;
 		else if(DrawImage.m_Angle < 0) DrawImage.m_Angle += 3600;
-    DrawImage.m_Scale = EGScale(pObj->GetStyleTransformZoom(0));
+		EG_Coord_t Zoom = pObj->GetStyleTransformZoom(0);
+    DrawImage.m_Scale.Set(Zoom, Zoom);
 		DrawImage.m_BlendMode = pObj->GetStyleBlendMode(0);
-		DrawImage.m_Antialias = s_pRefreshDisplay->m_pDriver->m_Antialiasing;
+		DrawImage.m_AntiAlias = s_pRefreshDisplay->m_pDriver->m_AntiAliasing;
 		if(Flags & EG_DRAW_LAYER_FLAG_CAN_SUBDIVIDE) {
 			pDrawLayer->m_ActiveRect = pDrawLayer->m_FullRect;
 			pDrawLayer->m_ActiveRect.SetY2(pDrawLayer->m_ActiveRect.GetY1() + pDrawLayer->m_MaxRowWithoutAlpha - 1);

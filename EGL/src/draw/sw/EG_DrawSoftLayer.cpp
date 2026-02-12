@@ -28,11 +28,11 @@
 
 //////////////////////////////////////////////////////////////////////////////////////
 
-EGLayerContext* EGSoftContext::DrawLayerCreate(EGLayerContext *pDrawLayer, EGDrawLayerFlags_e Flags)
+bool EGSoftContext::DrawLayerCreate(EGLayerContext *pDrawLayer, EGDrawLayerFlags_e Flags)
 {
 	if(EG_COLOR_SCREEN_TRANSP == 0 && (Flags & EG_DRAW_LAYER_FLAG_HAS_ALPHA)) {
 		EG_LOG_WARN("Rendering this widget needs EG_COLOR_SCREEN_TRANSP 1");
-		return nullptr;
+		return false;
 	}
 	uint32_t PixelSize = Flags & EG_DRAW_LAYER_FLAG_HAS_ALPHA ? EG_IMG_PX_SIZE_ALPHA_BYTE : sizeof(EG_Color_t);
 	if(Flags & EG_DRAW_LAYER_FLAG_CAN_SUBDIVIDE) {
@@ -45,9 +45,7 @@ EGLayerContext* EGSoftContext::DrawLayerCreate(EGLayerContext *pDrawLayer, EGDra
 									(uint32_t)pDrawLayer->m_BufferSizeBytes, (uint32_t)EG_LAYER_SIMPLE_FALLBACK_BUF_SIZE * PixelSize);
 			pDrawLayer->m_BufferSizeBytes = EG_LAYER_SIMPLE_FALLBACK_BUF_SIZE;
 			pDrawLayer->m_pLayerBuffer = EG_AllocMem(pDrawLayer->m_BufferSizeBytes);
-			if(pDrawLayer->m_pLayerBuffer == nullptr) {
-				return nullptr;
-			}
+			if(pDrawLayer->m_pLayerBuffer == nullptr) return false;
 		}
 		pDrawLayer->m_ActiveRect = pDrawLayer->m_FullRect;
 		pDrawLayer->m_ActiveRect.SetY2(pDrawLayer->m_FullRect.GetY1());
@@ -59,18 +57,16 @@ EGLayerContext* EGSoftContext::DrawLayerCreate(EGLayerContext *pDrawLayer, EGDra
 		pDrawLayer->m_ActiveRect = pDrawLayer->m_FullRect;
 		pDrawLayer->m_BufferSizeBytes = pDrawLayer->m_FullRect.GetSize() * PixelSize;
 		pDrawLayer->m_pLayerBuffer = EG_AllocMem(pDrawLayer->m_BufferSizeBytes);
+		if(pDrawLayer->m_pLayerBuffer == nullptr) return false;
 		EG_ZeroMem(pDrawLayer->m_pLayerBuffer, pDrawLayer->m_BufferSizeBytes);
 		pDrawLayer->m_HasAlpha = Flags & EG_DRAW_LAYER_FLAG_HAS_ALPHA ? 1 : 0;
-		if(pDrawLayer->m_pLayerBuffer == nullptr) {
-			return nullptr;
-		}
 		pDrawLayer->m_pContext->m_pDrawBuffer = pDrawLayer->m_pLayerBuffer;
 		pDrawLayer->m_pContext->m_pDrawRect = &pDrawLayer->m_ActiveRect;
 		pDrawLayer->m_pContext->m_pClipRect = &pDrawLayer->m_ActiveRect;
 		EGDisplay *pDisplay = GetRefreshingDisplay();
 		pDisplay->m_pDriver->m_ScreenTransparent = Flags & EG_DRAW_LAYER_FLAG_HAS_ALPHA ? 1 : 0;
 	}
-	return pDrawLayer;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -96,20 +92,20 @@ void EGSoftContext::DrawLayerAdjust(EGLayerContext *pDrawLayer,	 EGDrawLayerFlag
 
 void EGSoftContext::DrawLayerBlend(EGLayerContext *pDrawLayer, EGDrawImage *pImage)
 {
-	EGImageBuffer Image;
-	Image.m_pData = (uint8_t*)pDrawLayer->m_pContext->m_pDrawBuffer;
-	Image.m_Header.AlwaysZero = 0;
-	Image.m_Header.Width = pDrawLayer->m_pContext->m_pDrawRect->GetWidth();
-	Image.m_Header.Height = pDrawLayer->m_pContext->m_pDrawRect->GetHeight();
-	Image.m_Header.ColorFormat = pDrawLayer->m_HasAlpha ? EG_COLOR_FORMAT_NATIVE_ALPHA : EG_COLOR_FORMAT_NATIVE;
+	EGImageBuffer ImageBuffer;
+	ImageBuffer.m_pData = (uint8_t*)pDrawLayer->m_pContext->m_pDrawBuffer;
+	ImageBuffer.m_Header.AlwaysZero = 0;
+	ImageBuffer.m_Header.Width = pDrawLayer->m_pContext->m_pDrawRect->GetWidth();
+	ImageBuffer.m_Header.Height = pDrawLayer->m_pContext->m_pDrawRect->GetHeight();
+	ImageBuffer.m_Header.ColorFormat = pDrawLayer->m_HasAlpha ? EG_COLOR_FORMAT_NATIVE_ALPHA : EG_COLOR_FORMAT_NATIVE;
 	pDrawLayer->m_pContext->m_pDrawBuffer = pDrawLayer->m_Original.pBuffer;	// Restore the original draw_ctx
 	pDrawLayer->m_pContext->m_pDrawRect = pDrawLayer->m_Original.pBuferArea;
 	pDrawLayer->m_pContext->m_pClipRect = pDrawLayer->m_Original.pClipRect;
 	EGDisplay *pDisplay = GetRefreshingDisplay();
 	pDisplay->m_pDriver->m_ScreenTransparent = pDrawLayer->m_Original.ScreenTransparent;
-	pImage->Draw(pDrawLayer->m_pContext, &pDrawLayer->m_ActiveRect, &Image);	// Blend the layer
+	pImage->Draw(pDrawLayer->m_pContext, &pDrawLayer->m_ActiveRect, &ImageBuffer);	// Blend the layer
 	pDrawLayer->m_pContext->WaitForFinish();
-	InvalidateImageCacheSource(&Image);
+	InvalidateImageCacheSource(&ImageBuffer);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////

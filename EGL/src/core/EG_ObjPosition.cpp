@@ -1005,9 +1005,8 @@ void EGObject::LayoutUpdateCore(void)
 void EGObject::TransformCore(EGPoint *pPoint, bool Invert)
 {
 	int16_t Angle = GetStyleTransformAngle(0);
-	EGScale Scale(GetStyleTransformZoom(0));
-  Scale.Normalise();
-	if((Angle == 0) && !Scale.IsScaled()) return;
+	int16_t Zoom = GetStyleTransformZoom( 0);
+	if((Angle == 0) && (Zoom == EG_SCALE_NONE)) return;
 	EGPoint Pivot(GetStyleTransformPivotX(0), GetStyleTransformPivotY(0));
 	if(EG_COORD_IS_PCT(Pivot.m_X)) {
 		Pivot.m_X = (EG_COORD_GET_PCT(Pivot.m_X) * m_Rect.GetWidth()) / 100;
@@ -1019,9 +1018,9 @@ void EGObject::TransformCore(EGPoint *pPoint, bool Invert)
 	Pivot.m_Y = m_Rect.GetY1() + Pivot.m_Y;
 	if(Invert){
 		Angle = -Angle;
-		Scale.Negate();
+		Zoom = (256 * 256) / Zoom;
 	}
-	pPoint->PointTransform(Angle, Scale, &Pivot);
+	pPoint->PointTransform(Angle, EGScale(Zoom), &Pivot);
 }
 
 

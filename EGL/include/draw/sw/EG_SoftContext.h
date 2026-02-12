@@ -76,9 +76,9 @@ public:
   static void   DrawPolygon(const EGDrawPolygon *pDrawPolygon, const EGDrawRect *pRect, const EGPoint *pPoints, uint16_t PointCount);
   static void   DrawTransform(const EGRect *pRect, const void *pSrceBuffer, EG_Coord_t SourceWidth, EG_Coord_t SourceHeight, 
                   EG_Coord_t SourceStride, const EGDrawImage *pImage, EG_ImageColorFormat_t cf, EG_Color_t *pColorBuffer, EG_OPA_t *pOpaBuffer);
-  static EGLayerContext* DrawLayerCreate(EGLayerContext *pDrawLayer, EGDrawLayerFlags_e Flags);
+  static bool   DrawLayerCreate(EGLayerContext *pDrawLayer, EGDrawLayerFlags_e Flags);
   static void   DrawLayerAdjust(EGLayerContext *pDrawLayer, EGDrawLayerFlags_e flags);
-  static void   DrawLayerBlend(EGLayerContext *pDrawLayer, EGDrawImage *pImage);
+  static void   DrawLayerBlend(EGLayerContext *pDrawLayer, EGDrawImage *pDrawImage);
   static void   DrawLayerDestroy(EGLayerContext *pDrawLayer);
 
 private:

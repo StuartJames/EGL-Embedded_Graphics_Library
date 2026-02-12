@@ -30,6 +30,7 @@
 
 #include "../misc/EG_Style.h"
 #include "../misc/EG_Types.h"
+//#include "../misc/EG_Point.h"
 #include "../misc/EG_Rect.h"
 #include "../misc/EG_Color.h"
 #include "../misc/EG_Assert.h"

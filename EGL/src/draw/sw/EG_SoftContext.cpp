@@ -22,7 +22,7 @@
  */
 
 #include "draw/sw/EG_SoftContext.h"
-#include "draw/sw/EG_DrawSoftBlend.h"     // lv_draw_sw_blend
+#include "draw/sw/EG_DrawSoftBlend.h" 
 
 //////////////////////////////////////////////////////////////////////////////////////
 
@@ -50,7 +50,7 @@ void EGSoftContext::InitialiseContext(void)
 #endif
 	WaitForFinishProc = SoftWaitForFinish;
 	CopyBufferProc = BufferCopy;
-	IntialiseLayerProc = DrawLayerCreate;
+	LayerIntialiseProc = DrawLayerCreate;
 	LayerAdjustProc = DrawLayerAdjust;
 	LayerBlendProc = DrawLayerBlend;
 	LayerDestroyProc = DrawLayerDestroy;

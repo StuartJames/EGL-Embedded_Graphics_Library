@@ -46,7 +46,7 @@ void EGDisplay::InitialiseDriver(EGDisplayDriver *pDriver)
 	pDriver->m_PhysicalVerticalRes = -1;
 	pDriver->m_OffsetX = 0;
 	pDriver->m_OffsetY = 0;
-	pDriver->m_Antialiasing = EG_COLOR_DEPTH > 8 ? 1 : 0;
+	pDriver->m_AntiAliasing = EG_COLOR_DEPTH > 8 ? 1 : 0;
 	pDriver->m_ScreenTransparent = 0;
 	pDriver->m_DPI = EG_DPI_DEF;
 	pDriver->m_ColorChromaKey = EG_COLOR_CHROMA_KEY;
@@ -322,7 +322,7 @@ EG_Coord_t EGDisplay::GetOffsetY(void)
 
 bool EGDisplay::GetAntialiasing(void)
 {
-	return m_pDriver->m_Antialiasing ? true : false;
+	return m_pDriver->m_AntiAliasing ? true : false;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -542,7 +542,7 @@ EGDisplayDriver::EGDisplayDriver(void)
   m_DirectMode = 0;         
   m_FullRefresh = 0;        
   m_SoftRotate = 0;         
-  m_Antialiasing = 0;       
+  m_AntiAliasing = 0;       
   m_Rotated = 0;            
   m_ScreenTransparent = 0;  
   m_DPI = 0;               

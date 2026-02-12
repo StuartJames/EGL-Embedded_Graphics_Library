@@ -34,20 +34,23 @@
 
 EGImageBuffer::EGImageBuffer(void) :
   m_DataSize(0),
-  m_pData(nullptr)
+  m_pData(nullptr),
+  m_IsNative(false)
 {
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
 
-EGImageBuffer::EGImageBuffer(EG_Coord_t Width, EG_Coord_t Height, EG_ImageColorFormat_t ColorFormat)
+EGImageBuffer::EGImageBuffer(EG_Coord_t Width, EG_Coord_t Height, EG_ImageColorFormat_t ColorFormat) :
+  m_IsNative(false)
 {
   Allocate(Width, Height, ColorFormat);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
 
-EGImageBuffer::EGImageBuffer(EG_Coord_t Width, EG_Coord_t Height, EG_ImageColorFormat_t ColorFormat, const uint8_t *pData, uint32_t Size /*= 0*/)
+EGImageBuffer::EGImageBuffer(EG_Coord_t Width, EG_Coord_t Height, EG_ImageColorFormat_t ColorFormat, const uint8_t *pData, uint32_t Size /*= 0*/) :
+  m_IsNative(false)
 {
 	if(Size == 0) m_DataSize = CalculateBufferSize(Width, Height, ColorFormat);	// Get image data size
   else m_DataSize = Size;
@@ -63,7 +66,7 @@ EGImageBuffer::EGImageBuffer(EG_Coord_t Width, EG_Coord_t Height, EG_ImageColorF
 
 EGImageBuffer::~EGImageBuffer(void)
 {
-	if(m_pData != nullptr)	EG_FreeMem((void *)m_pData);
+	if((m_pData != nullptr) && m_IsNative)	EG_FreeMem((void *)m_pData);  // Warning, data can be a pointer to an external buffer
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -80,6 +83,7 @@ bool EGImageBuffer::Allocate(EG_Coord_t Width, EG_Coord_t Height, EG_ImageColorF
 	m_Header.Height = Height;
 	m_Header.ColorFormat = ColorFormat;
 	m_Header.Reserved = 0;
+  m_IsNative = true;
   return true;
 }
 
@@ -296,7 +300,7 @@ uint32_t EGImageBuffer::CalculateBufferSize(EG_Coord_t Width, EG_Coord_t Height,
 	switch(ColorFormat) {
 		case EG_COLOR_FORMAT_NATIVE:
 			return EG_IMG_BUF_SIZE_TRUE_COLOR(Width, Height);
-    case EG_COLOR_FORMAT_RAW_ALPHA:
+		case EG_COLOR_FORMAT_NATIVE_ALPHA:
 		case EG_COLOR_FORMAT_RGB565A8:
 			return EG_IMG_BUF_SIZE_TRUE_COLOR_ALPHA(Width, Height);
 		case EG_COLOR_FORMAT_NATIVE_CHROMA_KEYED:
@@ -332,25 +336,24 @@ EGPoint Point2(Width,0);
 EGPoint Point3(0,Height);
 EGPoint Point4(Width,Height);
 
-  if(Angle == 0 && !Scale.IsScaled()) {
+  if((Angle == 0) && (Scale.m_X == EG_SCALE_NONE) && (Scale.m_Y == EG_SCALE_NONE)) {
 		pRect->SetX1(0);
 		pRect->SetY1(0);
 		pRect->SetX2(Width - 1);
 		pRect->SetY2(Height - 1);
 		return;
 	}
-	Point1.PointTransform(Angle, Scale, pPivot);
-	Point2.PointTransform(Angle, Scale, pPivot);
-	Point3.PointTransform(Angle, Scale, pPivot);
-	Point4.PointTransform(Angle, Scale, pPivot);
+	Point1.PointTransform(Angle, Scale, pPivot, true);
+	Point2.PointTransform(Angle, Scale, pPivot, true);
+	Point3.PointTransform(Angle, Scale, pPivot, true);
+	Point4.PointTransform(Angle, Scale, pPivot, true);
 	pRect->SetX1(EG_MIN4(Point1.m_X, Point2.m_X, Point3.m_X, Point4.m_X) - 2);
 	pRect->SetX2(EG_MAX4(Point1.m_X, Point2.m_X, Point3.m_X, Point4.m_X) + 2);
 	pRect->SetY1(EG_MIN4(Point1.m_Y, Point2.m_Y, Point3.m_Y, Point4.m_Y) - 2);
 	pRect->SetY2(EG_MAX4(Point1.m_Y, Point2.m_Y, Point3.m_Y, Point4.m_Y) + 2);
 #else
 	EG_UNUSED(Angle);
-	EG_UNUSED(ScaleX);
-	EG_UNUSED(ScaleY);
+	EG_UNUSED(Scale);
 	EG_UNUSED(pPivot);
 	pRect->SetX1(0);
 	pRect->SetY1(0);
